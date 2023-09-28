@@ -26,6 +26,8 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ steps.branch-deploy.outputs.ref }}
+          environment: production # the default environment
+          environment_targets: "app1-dev,app2-dev,app1-qa,app2-qa,app1-prod,app2-prod"
 
         # If the branch-deploy Action was triggered, run the deployment (i.e. '.deploy')
       - name: deploy
