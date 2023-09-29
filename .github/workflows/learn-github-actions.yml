@@ -34,4 +34,4 @@ jobs:
         # If the branch-deploy Action was triggered, run the deployment (i.e. '.deploy')
       - name: deploy
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
-        run: echo ${{steps.branch-deploy.outputs.continue}} # this could be anything you want
+        run: echo ${{steps.branch-deploy.outputs}} # this could be anything you want
