@@ -1,4 +1,5 @@
 name: branch-deploy
+
 on:
   issue_comment:
     types: [created]
@@ -13,7 +14,7 @@ permissions:
 jobs:
   deploy:
     name: deploy
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: ${{ github.event.issue.pull_request }} # only run on pull request comments
 
     steps:
@@ -21,15 +22,16 @@ jobs:
       - name: branch-deploy
         id: branch-deploy
         uses: github/branch-deploy@v8.0.0
+        with:
+          environment_targets: 'app1-dev,app2-dev,app1-qa,app2-qa'
+          sticky_locks: "true"
 
         # If the branch-deploy Action was triggered, checkout our branch
       - uses: actions/checkout@v3
         with:
           ref: ${{ steps.branch-deploy.outputs.ref }}
-          environment: production # the default environment
-          environment_targets: "app1-dev,app2-dev,app1-qa,app2-qa,app1-prod,app2-prod"
 
         # If the branch-deploy Action was triggered, run the deployment (i.e. '.deploy')
       - name: deploy
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
-        run: echo "hello-world" # this could be anything you want
+        run: <do-your-deployment> # this could be anything you want
