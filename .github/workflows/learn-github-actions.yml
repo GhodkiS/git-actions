@@ -29,9 +29,9 @@ jobs:
         # If the branch-deploy Action was triggered, checkout our branch
       - uses: actions/checkout@v3
         with:
-          ref: ${{ steps.branch-deploy.outputs.ref }}
+          ref: main
 
         # If the branch-deploy Action was triggered, run the deployment (i.e. '.deploy')
       - name: deploy
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
-        run: echo ${{steps.branch-deploy.outputs}} # this could be anything you want
+        run: pwd && echo ${{steps.branch-deploy.outputs.ref}} && echo ${{steps.branch-deploy.outputs.environment}} # this could be anything you want
