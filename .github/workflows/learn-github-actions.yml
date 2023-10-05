@@ -30,6 +30,11 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: main
+      - uses: actions/cache/restore@v3
+        id: cache
+        with:
+          path: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
+          key: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
       - name: update target revision
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
         run: |
@@ -53,14 +58,14 @@ jobs:
           git add ./$t_env/$t_app/kustomize.yaml
           git commit -am "update target revision of ${{steps.branch-deploy.outputs.environment}} to ${{steps.branch-deploy.outputs.ref}}"
           git push
-          echo ${{steps.branch-deploy.outputs.environment}} >> ${{steps.branch-deploy.outputs.ref}}
+          echo ${{steps.branch-deploy.outputs.environment}} >> temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
       
       - name: Cache Primes
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
         id: cache-primes
         uses: actions/cache/save@v3
         with:
-          path: ${{steps.branch-deploy.outputs.ref}}
-          key: ${{steps.branch-deploy.outputs.ref}}
+          path: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
+          key: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
         
         # run: pwd && echo ${{steps.branch-deploy.outputs.ref}} && echo ${{steps.branch-deploy.outputs.environment}} # this could be anything you want
