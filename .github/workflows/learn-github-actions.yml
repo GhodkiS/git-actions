@@ -16,7 +16,7 @@ jobs:
     name: deploy
     runs-on: ubuntu-latest
     if: ${{ github.event.issue.pull_request }} # only run on pull request comments
-
+     
     steps:
       # The branch-deploy Action
       - name: branch-deploy
@@ -25,6 +25,10 @@ jobs:
         with:
           environment_targets: 'app1-dev,app2-dev,app1-qa,app2-qa'
           sticky_locks: "true"
+      - uses: actions/cache/restore@v3
+        with:
+          path: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
+          key: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
 
         # If the branch-deploy Action was triggered, checkout our branch
       - uses: actions/checkout@v3
