@@ -53,20 +53,14 @@ jobs:
           git add ./$t_env/$t_app/kustomize.yaml
           git commit -am "update target revision of ${{steps.branch-deploy.outputs.environment}} to ${{steps.branch-deploy.outputs.ref}}"
           git push
-          echo ${{steps.branch-deploy.outputs.ref}} >>  ${{steps.branch-deploy.outputs.environment}}
+          echo ${{steps.branch-deploy.outputs.environment}} >> ${{steps.branch-deploy.outputs.ref}}
       
-      - name: checkout to branch
-        id: branch-checkout
-        # If the branch-deploy Action was triggered, checkout our branch
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{steps.branch-deploy.outputs.ref}}
       - name: Cache Primes
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
         id: cache-primes
         uses: actions/cache/save@v3
         with:
-          path: ${{steps.branch-deploy.outputs.environment}}
-          key: ${{steps.branch-deploy.outputs.environment}}
+          path: ${{steps.branch-deploy.outputs.ref}}
+          key: ${{steps.branch-deploy.outputs.ref}}
         
         # run: pwd && echo ${{steps.branch-deploy.outputs.ref}} && echo ${{steps.branch-deploy.outputs.environment}} # this could be anything you want
