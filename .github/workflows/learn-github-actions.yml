@@ -55,9 +55,9 @@ jobs:
           git push
       - name: Cache Primes
         id: cache-primes
-        uses: actions/cache@v3
+        uses: actions/save@v3
         with:
           path: prime-numbers
-          key: ${{steps.branch-deploy.outputs.ref}}
+          key: ${{steps.branch-deploy.outputs.environment}}
         
         # run: pwd && echo ${{steps.branch-deploy.outputs.ref}} && echo ${{steps.branch-deploy.outputs.environment}} # this could be anything you want
