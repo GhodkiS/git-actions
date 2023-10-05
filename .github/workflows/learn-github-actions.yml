@@ -38,6 +38,7 @@ jobs:
         run: |
           git config --global user.name 'test-user'
           git config --global user.email 'saurabh.ghodki91@gmail.com'
+          git add report.txt
           git commit -am "update target revision"
           git push
 
