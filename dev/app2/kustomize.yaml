@@ -9,3 +9,10 @@
 #     - op: replace
 #       path: /spec/source/targetRevision
 #       value: feat/SREDEV-3579
+- target:
+    kind: Application
+    name: argocd-controller
+  patch: |-
+     - op: replace
+       path: /spec/source/targetRevision
+       value: feat/SREDEV-1234
