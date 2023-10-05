@@ -30,10 +30,9 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: main
-      - name: Create report file
+      - name: update target revision
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
         run: |
-          # Define the file you want to append to
           t_env_app="${{steps.branch-deploy.outputs.environment}}"
           t_app=$(echo "$t_env_app" | awk -F '-' '{print $1}')
           t_env=$(echo "$t_env_app" | awk -F '-' '{print $2}')
@@ -41,7 +40,7 @@ jobs:
           multiline_text=$(cat <<EOF
           - target:
               kind: Application
-              name: argocd-controller
+              name: $t_app
             patch: |-
                - op: replace
                  path: /spec/source/targetRevision
@@ -55,8 +54,8 @@ jobs:
         run: |
           git config --global user.name 'test-user'
           git config --global user.email 'saurabh.ghodki91@gmail.com'
-          git add ./dev/app2/kustomize.yaml
-          git commit -am "update target revision"
+          git add ./$t_env/$t_app/kustomize.yaml
+          git commit -am "update target revision of ${{steps.branch-deploy.outputs.environment}} to ${{steps.branch-deploy.outputs.ref}}"
           git push
 
 
