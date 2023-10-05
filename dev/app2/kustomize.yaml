@@ -9,3 +9,4 @@
 #     - op: replace
 #       path: /spec/source/targetRevision
 #       value: feat/SREDEV-3579
+
