@@ -23,7 +23,7 @@ jobs:
         id: branch-deploy
         uses: github/branch-deploy@v8.0.0
         with:
-          environment_targets: 'app1-dev,app2-dev,app1-qa,app2-qa'
+          environment_targets: 'app1:dev,app2:dev,app1:qa,app2:qa'
           sticky_locks: "true"
 
         # If the branch-deploy Action was triggered, checkout our branch
@@ -34,7 +34,10 @@ jobs:
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
         run: |
           # Define the file you want to append to
-          file="./dev/app2/kustomize.yaml"
+          t_env_app="${{steps.branch-deploy.outputs.environment}}"
+          t_app=$(echo "$t_env_app" | awk -F ':' '{print $1}')
+          t_env=$(echo "$t_env_app" | awk -F ':' '{print $2}')
+          file="./$t_env/$t_app/kustomize.yaml"
           multiline_text=$(cat <<EOF
           - target:
               kind: Application
@@ -42,7 +45,7 @@ jobs:
             patch: |-
                - op: replace
                  path: /spec/source/targetRevision
-                 value: feat/SREDEV-1234
+                 value: ${{steps.branch-deploy.outputs.ref}}
           EOF
           )
           echo "$multiline_text" >> "$file"
