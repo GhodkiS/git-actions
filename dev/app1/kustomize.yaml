@@ -1,1 +1,8 @@
 
+- target:
+    kind: Application
+    name: app1
+  patch: |-
+     - op: replace
+       path: /spec/source/targetRevision
+       value: branch2
