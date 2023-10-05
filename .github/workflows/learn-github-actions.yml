@@ -32,13 +32,27 @@ jobs:
           ref: main
       - name: Create report file
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
-        run: date +%s > report.txt
+        run: |
+          # Define the file you want to append to
+          file="./dev/app2/kustomize.yaml"
+          multiline_text=$(cat <<EOF
+          - target:
+              kind: Application
+              name: argocd-controller
+            patch: |-
+               - op: replace
+                 path: /spec/source/targetRevision
+                 value: feat/SREDEV-1234
+          EOF
+          )
+          echo "$multiline_text" >> "$file"
+
       - name: Commit report
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
         run: |
           git config --global user.name 'test-user'
           git config --global user.email 'saurabh.ghodki91@gmail.com'
-          git add report.txt
+          git add ./dev/app2/kustomize.yaml
           git commit -am "update target revision"
           git push
 
