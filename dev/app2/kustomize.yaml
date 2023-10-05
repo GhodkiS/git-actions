@@ -1,1 +1,11 @@
-
+#
+# You can use the following patch to change the target revision
+# This is necessary if you want to test a separate branch
+# The branch can be defined after value
+# - target:
+#     kind: Application
+#     name: argocd-controller
+#   patch: |-
+#     - op: replace
+#       path: /spec/source/targetRevision
+#       value: feat/SREDEV-3579
