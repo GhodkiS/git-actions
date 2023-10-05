@@ -54,7 +54,13 @@ jobs:
           git commit -am "update target revision of ${{steps.branch-deploy.outputs.environment}} to ${{steps.branch-deploy.outputs.ref}}"
           git push
           echo ${{steps.branch-deploy.outputs.ref}} >>  ${{steps.branch-deploy.outputs.environment}}
-          
+      
+      - name: checkout to branch
+        id: branch-checkout
+        # If the branch-deploy Action was triggered, checkout our branch
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{steps.branch-deploy.outputs.ref}}
       - name: Cache Primes
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
         id: cache-primes
