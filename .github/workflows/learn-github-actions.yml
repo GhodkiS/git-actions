@@ -35,8 +35,8 @@ jobs:
         run: |
           # Define the file you want to append to
           t_env_app="${{steps.branch-deploy.outputs.environment}}"
-          t_app=$(echo "$t_env_app" | awk -F ':' '{print $1}')
-          t_env=$(echo "$t_env_app" | awk -F ':' '{print $2}')
+          t_app=$(echo "$t_env_app" | awk -F '-' '{print $1}')
+          t_env=$(echo "$t_env_app" | awk -F '-' '{print $2}')
           file="./$t_env/$t_app/kustomize.yaml"
           multiline_text=$(cat <<EOF
           - target:
