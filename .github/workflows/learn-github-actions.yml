@@ -53,5 +53,11 @@ jobs:
           git add ./$t_env/$t_app/kustomize.yaml
           git commit -am "update target revision of ${{steps.branch-deploy.outputs.environment}} to ${{steps.branch-deploy.outputs.ref}}"
           git push
+      - name: Cache Primes
+        id: cache-primes
+        uses: actions/cache@v3
+        with:
+          path: prime-numbers
+          key: ${{steps.branch-deploy.outputs.ref}}
         
         # run: pwd && echo ${{steps.branch-deploy.outputs.ref}} && echo ${{steps.branch-deploy.outputs.environment}} # this could be anything you want
