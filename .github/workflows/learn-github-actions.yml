@@ -70,10 +70,16 @@ jobs:
       - name: update bd-lock
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
         run: |
-          echo ${{steps.branch-deploy.outputs.ref}} > bd-lock.json
+          #echo ${{steps.branch-deploy.outputs.ref}} > bd-lock.json
+          json_file="lock.json"
+          key_to_update="branch"
+          new_value=${{steps.branch-deploy.outputs.ref}}
+          json_content=$(cat "$json_file")
+          updated_json=$(echo "$json_content" | jq --arg key "$key_to_update" --arg value "$new_value" '.[$key] = $value')
+          echo "$updated_json" > "$json_file"
           git config --global user.name 'test-user'
           git config --global user.email 'tech.user@company.com'
-          git add bd-lock.json
+          git add "$json_file"
           git commit -am "update branch target"
           git push
         
