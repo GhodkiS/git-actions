@@ -66,10 +66,18 @@ jobs:
       
       - name: Cache Primes
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
-        id: cache-primes
-        uses: actions/cache/save@v3
+      - uses: actions/checkout@v3
         with:
-          path: bd-${{steps.branch-deploy.outputs.environment}}
-          key: bd-${{steps.branch-deploy.outputs.environment}}
+          ref: ${{steps.branch-deploy.outputs.environment}}-branch-deploy-lock
+          
+      - name: update target revision
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
+        run: |
+          echo ${{steps.branch-deploy.outputs.ref}} >> bd-lock.json
+          git config --global user.name 'test-user'
+          git config --global user.email 'tech.user@company.com'
+          git add bd-lock.json
+          git commit -am "update branch target"
+          git push
         
         # run: pwd && echo ${{steps.branch-deploy.outputs.ref}} && echo ${{steps.branch-deploy.outputs.environment}} # this could be anything you want
