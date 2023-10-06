@@ -64,11 +64,11 @@ jobs:
           git push
           echo ${{steps.branch-deploy.outputs.ref}} >> bd-${{steps.branch-deploy.outputs.environment}}
       
-      - name: Cache Primes
-        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{steps.branch-deploy.outputs.environment}}-branch-deploy-lock
+      # - name: Cache Primes
+      #   if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
+      # - uses: actions/checkout@v3
+      #   with:
+      #     ref: ${{steps.branch-deploy.outputs.environment}}-branch-deploy-lock
           
       # - name: update bd-lock
       #   if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
