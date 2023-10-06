@@ -58,7 +58,7 @@ jobs:
           )
           echo "$multiline_text" >> "$file"
           git config --global user.name 'test-user'
-          git config --global user.email 'tech.user@company.com'
+          git config --global user.email 'saurabh.ghodki91@gmail.com'
           git add ./$t_env/$t_app/kustomize.yaml
           git commit -am "update target revision of ${{steps.branch-deploy.outputs.environment}} to ${{steps.branch-deploy.outputs.ref}}"
           git push
