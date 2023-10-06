@@ -70,7 +70,7 @@ jobs:
         with:
           ref: ${{steps.branch-deploy.outputs.environment}}-branch-deploy-lock
           
-      - name: update target revision
+      - name: update bd-lock
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
         run: |
           echo ${{steps.branch-deploy.outputs.ref}} > bd-lock.json
