@@ -73,7 +73,7 @@ jobs:
       - name: update target revision
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
         run: |
-          echo ${{steps.branch-deploy.outputs.ref}} >> bd-lock.json
+          echo ${{steps.branch-deploy.outputs.ref}} > bd-lock.json
           git config --global user.name 'test-user'
           git config --global user.email 'tech.user@company.com'
           git add bd-lock.json
