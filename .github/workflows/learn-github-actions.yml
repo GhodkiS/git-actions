@@ -123,4 +123,5 @@ jobs:
           # git add ./$t_env/$t_app/kustomize.yaml
           # git commit -am "unlock ${{steps.branch-unlock.outputs.environment}}"
           # git push
-          ${{ steps.branch-unlock.outputs}}
+          json_string=$(echo "${{ steps.branch-unlock.outputs}}" | jq -c .)
+          echo "$json_string"
