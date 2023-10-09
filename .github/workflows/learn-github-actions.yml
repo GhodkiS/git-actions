@@ -87,7 +87,7 @@ jobs:
           git commit -am "update branch target"
           git push
 
-      - name: update bd-lock
+      - name: unlock-action
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && (contains(github.event.comment.body, '.unlock') }}
         run: |
           t_env_app="${{steps.branch-unlock.outputs.environment}}"
