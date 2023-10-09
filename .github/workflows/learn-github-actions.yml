@@ -15,7 +15,11 @@ jobs:
   deploy:
     name: deploy
     runs-on: ubuntu-latest
-    if: ${{ github.event.issue.pull_request }} # only run on pull request comments
+    if: # only run on pull request comments and very specific comment body string as defined in our branch-deploy settings
+      ${{ github.event.issue.pull_request &&
+      (contains(github.event.comment.body, '.deploy') ||
+      contains(github.event.comment.body, '.unlock') || 
+      (contains(github.event.comment.body, '.lock') && contains(github.event.comment.body, '--info')))  }}
      
     steps:
       # The branch-deploy Action
@@ -24,6 +28,7 @@ jobs:
         uses: github/branch-deploy@v8.0.0
         with:
           environment_targets: 'app1_dev,app2_dev,app1_qa,app2_qa'
+          trigger: '.deploy'
           sticky_locks: "true"
       - uses: actions/cache/restore@v3
         with:
