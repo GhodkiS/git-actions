@@ -36,11 +36,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: main
-      # - uses: actions/cache/restore@v3
-      #   id: cache
-      #   with:
-      #     path: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
-      #     key: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
+          
       - name: update target revision
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.deploy') }}
         run: |
@@ -72,7 +68,7 @@ jobs:
           ref: ${{steps.branch-deploy.outputs.environment}}-branch-deploy-lock
           
       - name: update bd-lock
-        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && (contains(github.event.comment.body, '.deploy') }}
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.deploy') }}
         run: |
           #echo ${{steps.branch-deploy.outputs.ref}} > bd-lock.json
           json_file="lock.json"
@@ -88,7 +84,7 @@ jobs:
           git push
 
       - name: unlock-action
-        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && (contains(github.event.comment.body, '.unlock') }}
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.unlock') }}
         run: |
           t_env_app="${{steps.branch-unlock.outputs.environment}}"
           t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
