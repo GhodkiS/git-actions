@@ -18,7 +18,6 @@ jobs:
     if: # only run on pull request comments and very specific comment body string as defined in our branch-deploy settings
       ${{ github.event.issue.pull_request &&
       (contains(github.event.comment.body, '.deploy') ||
-      contains(github.event.comment.body, '.unlock') || 
       (contains(github.event.comment.body, '.lock') && contains(github.event.comment.body, '--info')))  }}
      
     steps:
@@ -91,7 +90,7 @@ jobs:
     runs-on: ubuntu-latest
     if: # only run on pull request comments and very specific comment body string as defined in our branch-deploy settings
       ${{ github.event.issue.pull_request &&
-      (contains(github.event.comment.body, '.unlock') }}
+      contains(github.event.comment.body, '.unlock') }}
       
     steps:
       # The branch-deploy Action
