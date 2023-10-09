@@ -15,7 +15,10 @@ jobs:
   deploy:
     name: deploy
     runs-on: ubuntu-latest
-    if: ${{ github.event.issue.pull_request }} # only run on pull request comments
+    if: # only run on pull request comments and very specific comment body string as defined in our branch-deploy settings
+      ${{ github.event.issue.pull_request &&
+      (contains(github.event.comment.body, '.deploy') ||
+      (contains(github.event.comment.body, '.lock') && contains(github.event.comment.body, '--info')))  }}
      
     steps:
       # The branch-deploy Action
@@ -24,11 +27,8 @@ jobs:
         uses: github/branch-deploy@v8.0.0
         with:
           environment_targets: 'app1_dev,app2_dev,app1_qa,app2_qa'
+          trigger: '.deploy'
           sticky_locks: "true"
-      - uses: actions/cache/restore@v3
-        with:
-          path: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
-          key: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
 
         # If the branch-deploy Action was triggered, checkout our branch
       - uses: actions/checkout@v3
@@ -47,6 +47,7 @@ jobs:
           t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
           file="./$t_env/$t_app/kustomize.yaml"
           multiline_text=$(cat <<EOF
+          # lock target environment starts
           - target:
               kind: Application
               name: $t_app
@@ -54,6 +55,7 @@ jobs:
                - op: replace
                  path: /spec/source/targetRevision
                  value: ${{steps.branch-deploy.outputs.ref}}
+          # lock target environment ends
           EOF
           )
           echo "$multiline_text" >> "$file"
@@ -82,5 +84,42 @@ jobs:
           git add "$json_file"
           git commit -am "update branch target"
           git push
-        
-        # run: pwd && echo ${{steps.branch-deploy.outputs.ref}} && echo ${{steps.branch-deploy.outputs.environment}} # this could be anything you want
+
+  unlock:
+    name: unlock
+    runs-on: ubuntu-latest
+    if: # only run on pull request comments and very specific comment body string as defined in our branch-deploy settings
+      ${{ github.event.issue.pull_request &&
+      contains(github.event.comment.body, '.unlock') }}
+      
+    steps:
+      # The branch-deploy Action
+      - name: branch-unlock
+        id: branch-unlock
+        uses: github/branch-deploy@v8.0.0
+        with:
+          environment_targets: 'app1_dev,app2_dev,app1_qa,app2_qa'
+          trigger: '.unlock'
+
+        # If the branch-deploy Action was triggered, checkout our branch
+      - uses: actions/checkout@v3
+        with:
+          ref: main
+      # - uses: actions/cache/restore@v3
+      #   id: cache
+      #   with:
+      #     path: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
+      #     key: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
+      - name: update target revision
+        if: ${{ steps.branch-unlock.outputs.continue == 'true' && steps.branch-unlock.outputs.noop != 'true' }}
+        run: |
+          t_env_app="${{steps.branch-unlock.outputs.environment}}"
+          t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
+          t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
+          file="./$t_env/$t_app/kustomize.yaml"
+          sed -i '/# lock target environment starts/,/# lock target environment ends/d' $file
+          git config --global user.name 'test-user'
+          git config --global user.email 'saurabh.ghodki91@gmail.com'
+          git add ./$t_env/$t_app/kustomize.yaml
+          git commit -am "unlock ${{steps.branch-unlock.outputs.environment}}"
+          git push
