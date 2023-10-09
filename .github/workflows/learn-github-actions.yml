@@ -42,7 +42,7 @@ jobs:
       #     path: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
       #     key: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
       - name: update target revision
-        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && (contains(github.event.comment.body, '.deploy') }}
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.deploy') }}
         run: |
           t_env_app="${{steps.branch-deploy.outputs.environment}}"
           t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
