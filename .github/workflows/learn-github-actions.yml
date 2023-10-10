@@ -18,6 +18,7 @@ jobs:
     if: # only run on pull request comments and very specific comment body string as defined in our branch-deploy settings
       ${{ github.event.issue.pull_request &&
       (contains(github.event.comment.body, '.deploy') ||
+      contains(github.event.comment.body, '.unlock')  ||
       (contains(github.event.comment.body, '.lock') && contains(github.event.comment.body, '--info')))  }}
      
     steps:
@@ -28,19 +29,16 @@ jobs:
         with:
           environment_targets: 'app1_dev,app2_dev,app1_qa,app2_qa'
           trigger: '.deploy'
+          disable_naked_commands: "true" 
           sticky_locks: "true"
 
         # If the branch-deploy Action was triggered, checkout our branch
       - uses: actions/checkout@v3
         with:
           ref: main
-      # - uses: actions/cache/restore@v3
-      #   id: cache
-      #   with:
-      #     path: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
-      #     key: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
+          
       - name: update target revision
-        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.deploy') }}
         run: |
           t_env_app="${{steps.branch-deploy.outputs.environment}}"
           t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
@@ -70,7 +68,7 @@ jobs:
           ref: ${{steps.branch-deploy.outputs.environment}}-branch-deploy-lock
           
       - name: update bd-lock
-        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.deploy') }}
         run: |
           #echo ${{steps.branch-deploy.outputs.ref}} > bd-lock.json
           json_file="lock.json"
@@ -85,35 +83,10 @@ jobs:
           git commit -am "update branch target"
           git push
 
-  unlock:
-    name: unlock
-    runs-on: ubuntu-latest
-    if: # only run on pull request comments and very specific comment body string as defined in our branch-deploy settings
-      ${{ github.event.issue.pull_request &&
-      contains(github.event.comment.body, '.unlock') }}
-      
-    steps:
-      # The branch-deploy Action
-      - name: branch-deploy
-        id: branch-deploy
-        uses: github/branch-deploy@v8.0.0
-        with:
-          environment_targets: 'app1_dev,app2_dev,app1_qa,app2_qa'
-          trigger: '.unlock'
-
-        # If the branch-deploy Action was triggered, checkout our branch
-      - uses: actions/checkout@v3
-        with:
-          ref: main
-      # - uses: actions/cache/restore@v3
-      #   id: cache
-      #   with:
-      #     path: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
-      #     key: temp-branch-cache-${{steps.branch-deploy.outputs.ref}}
-      - name: update target revision
-        # if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
+      - name: unlock-action
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.unlock') }}
         run: |
-          t_env_app="${{steps.branch-deploy.outputs.environment}}"
+          t_env_app="${{steps.branch-unlock.outputs.environment}}"
           t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
           t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
           file="./$t_env/$t_app/kustomize.yaml"
@@ -121,5 +94,5 @@ jobs:
           git config --global user.name 'test-user'
           git config --global user.email 'saurabh.ghodki91@gmail.com'
           git add ./$t_env/$t_app/kustomize.yaml
-          git commit -am "unlock ${{steps.branch-deploy.outputs.environment}}"
+          git commit -am "unlock ${{steps.branch-unlock.outputs.environment}}"
           git push
