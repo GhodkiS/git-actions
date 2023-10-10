@@ -127,5 +127,5 @@ jobs:
         git config --global user.name 'test-user'
         git config --global user.email 'saurabh.ghodki91@gmail.com'
         git add ./$t_env/$t_app/kustomize.yaml
-        git commit -am "unlock ${{steps.branch-unlock.outputs.environment}}"
+        git commit -am "unlock $t_env_app"
         git push
