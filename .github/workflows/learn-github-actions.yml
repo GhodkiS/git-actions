@@ -28,7 +28,7 @@ jobs:
           if [[ "${{github.event.comment.body}}" == ".deploy"* ]]
           then
               t_env=$(echo "${{github.event.comment.body}}" | sed 's/\.deploy //g')
-          elif
+          else
               t_env=$(echo "${{github.event.comment.body}}" | sed 's/\.lock //g' | sed 's/--info//g' )
           fi
           echo "GITHUB_TARGET_ENV=$t_env" >> $GITHUB_ENV
