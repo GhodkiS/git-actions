@@ -62,6 +62,20 @@ jobs:
           git add ./$t_env/$t_app/kustomize.yaml
           git commit -am "update target revision of ${{steps.branch-deploy.outputs.environment}} to ${{steps.branch-deploy.outputs.ref}}"
           git push
+        
+      - name: unlock-action
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.unlock') }}
+        run: |
+          t_env_app="${{steps.branch-unlock.outputs.environment}}"
+          t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
+          t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
+          file="./$t_env/$t_app/kustomize.yaml"
+          sed -i '/# lock target environment starts/,/# lock target environment ends/d' $file
+          git config --global user.name 'test-user'
+          git config --global user.email 'saurabh.ghodki91@gmail.com'
+          git add ./$t_env/$t_app/kustomize.yaml
+          git commit -am "unlock ${{steps.branch-unlock.outputs.environment}}"
+          git push
           
       - uses: actions/checkout@v3
         with:
@@ -81,18 +95,4 @@ jobs:
           git config --global user.email 'tech.user@company.com'
           git add "$json_file"
           git commit -am "update branch target"
-          git push
-
-      - name: unlock-action
-        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.unlock') }}
-        run: |
-          t_env_app="${{steps.branch-unlock.outputs.environment}}"
-          t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
-          t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
-          file="./$t_env/$t_app/kustomize.yaml"
-          sed -i '/# lock target environment starts/,/# lock target environment ends/d' $file
-          git config --global user.name 'test-user'
-          git config --global user.email 'saurabh.ghodki91@gmail.com'
-          git add ./$t_env/$t_app/kustomize.yaml
-          git commit -am "unlock ${{steps.branch-unlock.outputs.environment}}"
           git push
