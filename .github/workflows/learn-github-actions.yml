@@ -25,6 +25,12 @@ jobs:
       - name: create-env-target-deploy
         id: create-env-target-deploy
         run: |
+          if [ ${{(contains(github.event.comment.body, '.lock') && contains(github.event.comment.body, '--info'))}} ]
+          then
+              t_env=$(echo "${{github.event.comment.body}}" | sed 's/\.unlock //g' | sed 's/--info//g' )
+          elif
+              t_env=$(echo "${{github.event.comment.body}}" | sed 's/\.deploy //g')
+          fi
           t_env=$(echo "${{github.event.comment.body}}" | sed 's/\.deploy //g')
           echo "GITHUB_TARGET_ENV=$t_env" >> $GITHUB_ENV
       - name: branch-deploy
