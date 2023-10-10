@@ -22,11 +22,17 @@ jobs:
      
     steps:
       # The branch-deploy Action
+      - name: create-env-target-deploy
+        if: ${{ contains(github.event.comment.body, '.deploy') }}
+        id: create-env-target-deploy
+        run: |
+          t_env=$(echo "${{github.event.comment.body}}" | sed 's/\.deploy //g')
+          echo "GITHUB_TARGET_ENV=$t_env" >> $GITHUB_ENV
       - name: branch-deploy
         id: branch-deploy
         uses: github/branch-deploy@v8.0.0
         with:
-          environment_targets: 'app1_dev,app2_dev,app1_qa,app2_qa'
+          environment_targets: ${{env.GITHUB_TARGET_ENV}}
           trigger: '.deploy'
           disable_naked_commands: "true" 
           sticky_locks: "true"
@@ -39,7 +45,7 @@ jobs:
       - name: update target revision
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.deploy') }}
         run: |
-          t_env_app="${{steps.branch-deploy.outputs.environment}}"
+          t_env_app="${{env.GITHUB_TARGET_ENV}}"
           t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
           t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
           file="./$t_env/$t_app/kustomize.yaml"
@@ -89,8 +95,8 @@ jobs:
       ${{ github.event.issue.pull_request &&
       contains(github.event.comment.body, '.unlock') }}
     steps:
-    - name: create-env-target
-      id: create-env-target
+    - name: create-env-target-unlock
+      id: create-env-target-unlock
       run: |
         t_env=$(echo "${{github.event.comment.body}}" | sed 's/\.unlock //g')
         echo "GITHUB_TARGET_ENV=$t_env" >> $GITHUB_ENV
