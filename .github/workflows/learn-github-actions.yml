@@ -87,10 +87,9 @@ jobs:
     runs-on: ubuntu-latest
     if: # only run on pull request comments and very specific comment body string as defined in our branch-deploy settings
       ${{ github.event.issue.pull_request &&
-      (contains(github.event.comment.body, '.unlock')
+      (contains(github.event.comment.body, '.unlock') }}
     steps:
     - name: unlock-action
-      if: ${{ contains(github.event.comment.body, '.unlock') }}
       run: |
         t_env_app=$(echo "${{github.event.comment.body}}" | sed 's/\.unlock //g')
         t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
