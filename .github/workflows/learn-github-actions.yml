@@ -72,6 +72,14 @@ jobs:
           git add ./$t_env/$t_app/kustomize.yaml
           git commit -am "update target revision of ${{steps.branch-deploy.outputs.environment}} to ${{steps.branch-deploy.outputs.ref}}"
           git push
+          echo $t_env_app >>  bd-${{steps.branch-deploy.outputs.ref}}
+        
+      - name: Cache target env
+        id: cache-target-env
+        uses: actions/cache@v3
+        with:
+          path: bd-${{steps.branch-deploy.outputs.ref}}
+          key: bd-${{steps.branch-deploy.outputs.ref}}
         
       - uses: actions/checkout@v3
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.deploy') }}
