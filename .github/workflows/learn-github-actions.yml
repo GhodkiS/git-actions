@@ -23,7 +23,6 @@ jobs:
     steps:
       # The branch-deploy Action
       - name: create-env-target-deploy
-        if: ${{ contains(github.event.comment.body, '.deploy') }}
         id: create-env-target-deploy
         run: |
           t_env=$(echo "${{github.event.comment.body}}" | sed 's/\.deploy //g')
