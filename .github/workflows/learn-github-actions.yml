@@ -18,7 +18,6 @@ jobs:
     if: # only run on pull request comments and very specific comment body string as defined in our branch-deploy settings
       ${{ github.event.issue.pull_request &&
       (contains(github.event.comment.body, '.deploy') ||
-      contains(github.event.comment.body, '.unlock')  ||
       (contains(github.event.comment.body, '.lock') && contains(github.event.comment.body, '--info')))  }}
      
     steps:
@@ -63,20 +62,6 @@ jobs:
           git commit -am "update target revision of ${{steps.branch-deploy.outputs.environment}} to ${{steps.branch-deploy.outputs.ref}}"
           git push
         
-      - name: unlock-action
-        if: ${{ contains(github.event.comment.body, '.unlock') }}
-        run: |
-          t_env_app="${{steps.branch-unlock.outputs.environment}}"
-          t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
-          t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
-          file="./$t_env/$t_app/kustomize.yaml"
-          sed -i '/# lock target environment starts/,/# lock target environment ends/d' $file
-          git config --global user.name 'test-user'
-          git config --global user.email 'saurabh.ghodki91@gmail.com'
-          git add ./$t_env/$t_app/kustomize.yaml
-          git commit -am "unlock ${{steps.branch-unlock.outputs.environment}}"
-          git push
-
       - uses: actions/checkout@v3
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.deploy') }}
         with:
@@ -96,3 +81,23 @@ jobs:
           git add "$json_file"
           git commit -am "update branch target"
           git push
+
+  unlock:
+    name: unlock
+    runs-on: ubuntu-latest
+    if: # only run on pull request comments and very specific comment body string as defined in our branch-deploy settings
+      ${{ github.event.issue.pull_request &&
+      contains(github.event.comment.body, '.unlock') }}
+    steps:
+    - name: unlock-action
+      run: |
+        t_env_app=$(echo "${{github.event.comment.body}}" | sed 's/\.unlock //g')
+        t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
+        t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
+        file="./$t_env/$t_app/kustomize.yaml"
+        sed -i '/# lock target environment starts/,/# lock target environment ends/d' $file
+        git config --global user.name 'test-user'
+        git config --global user.email 'saurabh.ghodki91@gmail.com'
+        git add ./$t_env/$t_app/kustomize.yaml
+        git commit -am "unlock ${{steps.branch-unlock.outputs.environment}}"
+        git push
