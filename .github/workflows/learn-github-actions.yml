@@ -25,7 +25,7 @@ jobs:
       - name: create-env-target-deploy
         id: create-env-target-deploy
         run: |
-          if [[ "${{github.event.comment.body}} == ".deploy"* ]]
+          if [[ "${{github.event.comment.body}}" == ".deploy"* ]]
           then
               t_env=$(echo "${{github.event.comment.body}}" | sed 's/\.deploy //g')
           elif
