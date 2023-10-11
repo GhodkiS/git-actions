@@ -33,8 +33,8 @@ jobs:
           key_to_update="branch"
           git branch -r | grep "\-branch\-deploy\-lock" | while read -r branch ; do
           git checkout $branch
-          lock_branch=$(jq -r ".branch" lock.json 2> /dev/null)
-          echo $lock_branch
+          #lock_branch=$(jq -r ".branch" lock.json 2> /dev/null)
+          #echo $lock_branch
           done
 
 
