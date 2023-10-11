@@ -27,7 +27,6 @@ jobs:
           ref: main
       - name: list branches
         run: |
-          git_active_lock="temp"
           json_file="lock.json"
           key_to_update="branch"
           for locked_env in $(git branch -r | grep "\-branch\-deploy\-lock");
