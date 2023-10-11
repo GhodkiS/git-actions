@@ -35,6 +35,10 @@ jobs:
           git checkout $branch
           lock_branch=$(jq -r ".branch" "$json_file" 2> /dev/null)
           echo $lock_branch
+          if [[ "$lock_branch" == "${{ github.event.pull_request.ref}}" ]]
+          then
+          echo "branch matches"
+          fi
           done
 
 
