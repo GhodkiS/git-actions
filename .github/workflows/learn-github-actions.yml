@@ -3,6 +3,10 @@ name: branch-deploy
 on:
   issue_comment:
     types: [created]
+  pull_request:
+    branches: 
+      - main
+    types: [closed]
 
 # Permissions needed for reacting and adding comments for IssueOps commands
 permissions:
@@ -12,6 +16,16 @@ permissions:
   checks: read
 
 jobs:
+
+  my-action:
+    if: ${{ github.event.pull_request.merged }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: merge-run
+      run: |
+        echo "run during merge"
+
+
   deploy:
     name: deploy
     runs-on: ubuntu-latest
@@ -73,13 +87,6 @@ jobs:
           git commit -am "update target revision of ${{steps.branch-deploy.outputs.environment}} to ${{steps.branch-deploy.outputs.ref}}"
           git push
           echo $t_env_app >>  bd-${{steps.branch-deploy.outputs.ref}}
-        
-      - name: Cache target env
-        id: cache-target-env
-        uses: actions/cache/save@v3
-        with:
-          path: bd-${{steps.branch-deploy.outputs.ref}}
-          key: bd-${{steps.branch-deploy.outputs.ref}}
         
       - uses: actions/checkout@v3
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.deploy') }}
