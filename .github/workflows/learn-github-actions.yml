@@ -35,7 +35,7 @@ jobs:
           git checkout $branch
           lock_branch=$(jq -r ".branch" lock.jsonn 2> /dev/null)
           done
-          ${{github.ref}}
+          ${{ github.event.pull_request.base.ref }}
 
 
   deploy:
