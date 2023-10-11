@@ -29,7 +29,7 @@ jobs:
           ref: main
       - name: list branches
         run: |
-          git_active_lock=""
+          gt_active_lock=""
           json_file="lock.json"
           key_to_update="branch"
           for locked_env in $(git branch -r | grep "\-branch\-deploy\-lock");
@@ -39,13 +39,13 @@ jobs:
           lock_env=$(jq -r ".environment" "$json_file" 2> /dev/null)
           if [[ "$lock_branch" == "${{ github.head_ref }}" ]]
           then
-          git_active_lock_flag=true
-          git_active_lock="${git_active_lock}  ${locked_env}"
+          gt_active_lock_flag=true
+          gt_active_lock="${gt_active_lock}  ${locked_env}"
           fi
           done
-          if [[ "$git_active_lock_flag" = true ]]
+          if [[ "$gt_active_lock_flag" = true ]]
           then
-          throw "Error: locks present on branch: ${{git_active_lock}} ."
+          throw "Error: locks present on branch: ${{gt_active_lock}} ."
           fi
 
   deploy:
