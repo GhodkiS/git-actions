@@ -29,17 +29,23 @@ jobs:
           ref: main
       - name: list branches
         run: |
+          git_active_lock=""
           json_file="lock.json"
           key_to_update="branch"
           git branch -r | grep "\-branch\-deploy\-lock" | while read -r branch ; do
           git checkout $branch
           lock_branch=$(jq -r ".branch" "$json_file" 2> /dev/null)
+          lock_env=$(jq -r ".environment" "$json_file" 2> /dev/null)
           if [[ "$lock_branch" == "${{ github.head_ref }}" ]]
           then
-          echo "GITHUB_ACTIVE_LOCK=true" >> $GITHUB_ENV
-          break
+          git_active_lock_flag=true
+          git_active_lock+="$lock_env"
           fi
           done
+          if [[ "$git_active_lock_flag" = true ]]
+          then
+          throw "Error: locks present on branch: git_active_lock ."
+          fi
 
   deploy:
     name: deploy
