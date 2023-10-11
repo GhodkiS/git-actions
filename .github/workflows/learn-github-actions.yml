@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: 
       - main
-    types: [closed]
+    types: [ opened, reopened, synchronize ]
 
 # Permissions needed for reacting and adding comments for IssueOps commands
 permissions:
@@ -16,7 +16,7 @@ permissions:
   checks: read
 
 jobs:
-  my-action:
+  PR-action:
       if: ${{ github.event.pull_request.merged }}
       runs-on: ubuntu-latest
       steps:
@@ -36,12 +36,10 @@ jobs:
           lock_branch=$(jq -r ".branch" "$json_file" 2> /dev/null)
           if [[ "$lock_branch" == "${{ github.head_ref }}" ]]
           then
-          echo "GITHUB_TARGET_LOCK=true" >> $GITHUB_ENV
+          echo "GITHUB_ACTIVE_LOCK=true" >> $GITHUB_ENV
           break
           fi
           done
-          $GITHUB_TARGET_LOCK
-
 
   deploy:
     name: deploy
