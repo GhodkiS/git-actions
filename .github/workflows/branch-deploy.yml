@@ -40,6 +40,7 @@ jobs:
           trigger: '.deploy'
           disable_naked_commands: "true" 
           sticky_locks: "true"
+          unlock_on_merge_mode: "true"
 
         # If the branch-deploy Action was triggered, checkout our branch
       - uses: actions/checkout@v3
@@ -114,6 +115,7 @@ jobs:
         trigger: '.deploy'
         disable_naked_commands: "true" 
         sticky_locks: "true"
+        unlock_on_merge_mode: "true"
 
         # If the branch-deploy Action was triggered, checkout our branch
     - uses: actions/checkout@v3
