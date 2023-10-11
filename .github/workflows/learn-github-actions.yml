@@ -37,7 +37,7 @@ jobs:
           if [[ "$lock_branch" == "${{ github.head_ref }}" ]]
           then
           git_active_lock_flag=true
-          git_active_lock="${git_active_lock};${$lock_env}"
+          git_active_lock="${git_active_lock};${lock_env}"
           fi
           done
           if [[ "${git_active_lock_flag}" = true ]]
