@@ -1,0 +1,48 @@
+name: branch-deploy-lock
+
+on:
+  pull_request:
+    branches: 
+      - main
+    types: [ opened, reopened, synchronize ]
+  workflow_run:
+    workflows: ["branch-deploy"]
+    types:
+      - completed
+
+# Permissions needed for reacting and adding comments for IssueOps commands
+permissions:
+  pull-requests: write
+  deployments: write
+  contents: write
+  checks: read
+
+jobs:
+  branch-deploy-lock:
+      runs-on: ubuntu-latest
+      steps:
+      - name: checkout-main
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: main
+      - name: list branches
+        run: |
+          json_file="lock.json"
+          key_to_update="branch"
+          for branch in $(git branch -r | grep "\-branch\-deploy\-lock");
+          do
+          git checkout $branch
+          lock_branch=$(jq -r ".branch" "$json_file" 2> /dev/null)
+          lock_env=$(jq -r ".environment" "$json_file" 2> /dev/null)
+          if [[ "$lock_branch" == "${{ github.head_ref }}" ]]
+          then
+          git_active_lock_flag=true
+          git_active_lock="${git_active_lock};${lock_env}"
+          fi
+          done
+          if [[ "${git_active_lock_flag}" = true ]]
+          then
+          echo "found active locks: ${git_active_lock}"
+          exit 1
+          fi

@@ -10,3 +10,12 @@
 #       path: /spec/source/targetRevision
 #       value: feat/SREDEV-3579
 
+# lock target environment starts
+- target:
+    kind: Application
+    name: app2
+  patch: |-
+     - op: replace
+       path: /spec/source/targetRevision
+       value: SREDEV-1234
+# lock target environment ends
