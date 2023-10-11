@@ -44,7 +44,7 @@ jobs:
           fi
 
       - name: unlock on merge
-        uses: github/branch-deploy@vX.X.X
+        uses: github/branch-deploy@v8.0.0
         id: unlock-on-merge
         with:
           unlock_on_merge_mode: "true"
