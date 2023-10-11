@@ -34,6 +34,7 @@ jobs:
           git checkout $branch
           lock_branch=$(jq -r ".branch" "$json_file" 2> /dev/null)
           lock_env=$(jq -r ".environment" "$json_file" 2> /dev/null)
+          echo lock_env
           if [[ "$lock_branch" == "${{ github.head_ref }}" ]]
           then
           git_active_lock_flag=true
