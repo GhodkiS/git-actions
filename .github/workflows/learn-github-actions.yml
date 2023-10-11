@@ -34,12 +34,13 @@ jobs:
           git branch -r | grep "\-branch\-deploy\-lock" | while read -r branch ; do
           git checkout $branch
           lock_branch=$(jq -r ".branch" "$json_file" 2> /dev/null)
-          echo $lock_branch
           if [[ "$lock_branch" == "${{ github.head_ref }}" ]]
           then
-          echo "branch matches"
+          echo "GITHUB_TARGET_LOCK=true >> $GITHUB_ENV
+          break
           fi
           done
+          $GITHUB_TARGET_LOCK
 
 
   deploy:
