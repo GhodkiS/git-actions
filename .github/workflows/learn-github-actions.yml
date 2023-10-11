@@ -29,8 +29,11 @@ jobs:
           ref: main
       - name: list branches
         run: |
+          json_file="lock.json"
+          key_to_update="branch"
           git branch -r | grep "\-branch\-deploy\-lock" | while read -r branch ; do
-          git checkout  $branch
+          git checkout $branch
+          jq -r '.name' "$json_file"
           done
 
 
