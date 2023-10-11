@@ -36,7 +36,7 @@ jobs:
           lock_branch=$(jq -r ".branch" "$json_file" 2> /dev/null)
           if [[ "$lock_branch" == "${{ github.head_ref }}" ]]
           then
-          echo "GITHUB_TARGET_LOCK=true >> $GITHUB_ENV
+          echo "GITHUB_TARGET_LOCK=true" >> $GITHUB_ENV
           break
           fi
           done
