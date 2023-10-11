@@ -83,10 +83,15 @@ jobs:
         run: |
           #echo ${{steps.branch-deploy.outputs.ref}} > bd-lock.json
           json_file="lock.json"
-          key_to_update="branch"
-          new_value=${{steps.branch-deploy.outputs.ref}}
+          key_to_update1="branch"
+          key_to_update2="link"
+          new_value1=${{steps.branch-deploy.outputs.ref}}
+          new_value2=${{github.event.comment.html_url}}
           json_content=$(cat "$json_file")
-          updated_json=$(echo "$json_content" | jq --arg key "$key_to_update" --arg value "$new_value" '.[$key] = $value')
+          updated_json=$(echo "$json_content" | jq --arg key "$key_to_update1" --arg value "$new_value1" '.[$key] = $value')
+          echo "$updated_json" > "$json_file"
+          json_content=$(cat "$json_file")
+          updated_json=$(echo "$json_content" | jq --arg key "$key_to_update2" --arg value "$new_value2" '.[$key] = $value')
           echo "$updated_json" > "$json_file"
           git config --global user.name 'test-user'
           git config --global user.email 'tech.user@company.com'
@@ -121,7 +126,6 @@ jobs:
         ref: main
     - name: unlock-action
       run: |
-        echo ${{github.event.comment.html_url}}
         t_env_app=${{env.GITHUB_TARGET_ENV}}
         t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
         t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
