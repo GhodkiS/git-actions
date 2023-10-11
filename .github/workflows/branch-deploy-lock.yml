@@ -34,10 +34,19 @@ jobs:
           if [[ "$lock_branch" == "${{ github.head_ref }}" ]]
           then
           git_active_lock_flag=true
-          git_active_lock="${git_active_lock};${lock_env}"
+          git_active_lock="${git_active_lock},${lock_env}"
           fi
           done
           if [[ "${git_active_lock_flag}" = true ]]
           then
+          git_active_lock=$(echo $git_active_lock | cut -c2-)
           echo "found active locks: ${git_active_lock}"
+          echo "GITHUB_ACTIVE_LOCKS=$git_active_lock" >> $GITHUB_ENV
           fi
+
+      - name: unlock on merge
+        uses: github/branch-deploy@v8.0.0
+        id: unlock-on-merge
+        with:
+          unlock_on_merge_mode: "true"
+          environment_targets: ${{env.GITHUB_ACTIVE_LOCKS}}
