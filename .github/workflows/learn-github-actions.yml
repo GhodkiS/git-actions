@@ -33,8 +33,9 @@ jobs:
           key_to_update="branch"
           git branch -r | grep "\-branch\-deploy\-lock" | while read -r branch ; do
           git checkout $branch
-          ls
+          lock_branch=$(jq -r ".branch" lock.jsonn 2> /dev/null)
           done
+          ${{github.ref}}
 
 
   deploy:
