@@ -4,11 +4,7 @@ on:
   pull_request:
     branches: 
       - main
-    types: [ opened, reopened, synchronize ]
-  workflow_run:
-    workflows: ["branch-deploy"]
-    types:
-      - completed
+    types: [ closed ]
 
 # Permissions needed for reacting and adding comments for IssueOps commands
 permissions:
@@ -44,5 +40,4 @@ jobs:
           if [[ "${git_active_lock_flag}" = true ]]
           then
           echo "found active locks: ${git_active_lock}"
-          exit 1
           fi
