@@ -23,6 +23,13 @@ jobs:
       - name: merge-run
         run: |
           echo "run during merge"
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: main
+      - name: list branches
+        run: |
+          git branch -r | grep "-branch-deploy-lock" 
   deploy:
     name: deploy
     runs-on: ubuntu-latest
