@@ -39,7 +39,7 @@ jobs:
           done
           if [[ "${git_active_lock_flag}" = true ]]
           then
-          git_active_lock=$($git_active_lock | cut -c2-)
+          git_active_lock=$(echo $git_active_lock | cut -c2-)
           echo "found active locks: ${git_active_lock}"
           echo "GITHUB_ACTIVE_LOCKS=$git_active_lock" >> $GITHUB_ENV
           fi
