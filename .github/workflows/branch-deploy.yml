@@ -121,6 +121,7 @@ jobs:
         ref: main
     - name: unlock-action
       run: |
+        echo ${{github.event.comment.html_url}}
         t_env_app=${{env.GITHUB_TARGET_ENV}}
         t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
         t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
