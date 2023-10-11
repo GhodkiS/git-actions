@@ -29,7 +29,7 @@ jobs:
           ref: main
       - name: list branches
         run: |
-          git branch -r | grep "-branch-deploy-lock" 
+          git branch -r
   deploy:
     name: deploy
     runs-on: ubuntu-latest
