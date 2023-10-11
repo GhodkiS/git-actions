@@ -42,9 +42,11 @@ jobs:
           git_active_lock+="$lock_env"
           fi
           done
+          $git_active_lock_flag
+          $git_active_lock
           if [[ "$git_active_lock_flag" = true ]]
           then
-          throw "Error: locks present on branch: git_active_lock ."
+          throw "Error: locks present on branch: ${{git_active_lock}} ."
           fi
 
   deploy:
