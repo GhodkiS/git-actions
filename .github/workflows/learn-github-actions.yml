@@ -29,17 +29,17 @@ jobs:
         run: |
           json_file="lock.json"
           key_to_update="branch"
-          for locked_env in $(git branch -r | grep "\-branch\-deploy\-lock");
+          for branch in $(git branch -r | grep "\-branch\-deploy\-lock");
           do
           git checkout $branch
           lock_branch=$(jq -r ".branch" "$json_file" 2> /dev/null)
           lock_env=$(jq -r ".environment" "$json_file" 2> /dev/null)
-          echo lock_env
           if [[ "$lock_branch" == "${{ github.head_ref }}" ]]
           then
           git_active_lock_flag=true
           fi
           done
+          echo git_active_lock_flag
 
   deploy:
     name: deploy
