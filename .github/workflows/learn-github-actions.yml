@@ -35,7 +35,7 @@ jobs:
           git checkout $branch
           lock_branch=$(jq -r ".branch" "$json_file" 2> /dev/null)
           echo $lock_branch
-          if [[ "$lock_branch" == "${{ github.ref_name }}" ]]
+          if [[ "$lock_branch" == "${{ github.head_ref }}" ]]
           then
           echo "branch matches"
           fi
