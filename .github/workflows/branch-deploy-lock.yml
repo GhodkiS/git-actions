@@ -43,8 +43,10 @@ jobs:
           echo "found active locks: ${git_active_lock}"
           echo "GITHUB_ACTIVE_LOCKS=$git_active_lock" >> $GITHUB_ENV
           fi
+          git checkout main
 
       - name: unlock on merge
+        if: github.event.pull_request.merged == true
         uses: github/branch-deploy@v8.0.0
         id: unlock-on-merge
         with:
@@ -52,9 +54,15 @@ jobs:
           environment_targets: ${{env.GITHUB_ACTIVE_LOCKS}}
 
       - name: checkout-main-unlock
-        uses: actions/checkout@v3
-        with:
-          ref: main
+        if: github.event.pull_request.merged == false
+        run: |
+          git config --global user.name 'test-user'
+          git config --global user.email 'saurabh.ghodki91@gmail.com'
+          active_locks=${{env.GITHUB_ACTIVE_LOCKS}}
+          for t_env_app in $(echo $active_locks | sed "s/,/ /g")
+          do
+          git push origin --delete "${{t_env_app}}-branch-deploy-lock"
+          done
 
       - name: unlock-action
         run: |
