@@ -1,0 +1,4 @@
+apiVersion: kustomize
+metadata:
+  name: app1
+  labels: qa

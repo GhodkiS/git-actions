@@ -74,9 +74,9 @@ jobs:
           do
           t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
           t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
-          file="./$t_env/$t_app/kustomize.yaml"
+          file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
           sed -i '/# lock target environment starts/,/# lock target environment ends/d' $file
-          git add ./$t_env/$t_app/kustomize.yaml
+          git add ./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml
           done
           git commit -am "unlock $t_env_app [skip ci]"
           git push

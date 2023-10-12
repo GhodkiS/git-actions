@@ -33,7 +33,7 @@ jobs:
               t_env_app=$(echo "${{github.event.comment.body}}" | sed 's/\.deploy //g')
               t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
               t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
-              if [ ! -f "./$t_env/$t_app/kustomize.yaml" ]
+              if [ ! -f "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml" ]
               then
               echo "no target environment found"
               exit 1
@@ -57,7 +57,7 @@ jobs:
           t_env_app="${{env.GITHUB_TARGET_ENV}}"
           t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
           t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
-          file="./$t_env/$t_app/kustomize.yaml"
+          file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
           sed -i '/# lock target environment starts/,/# lock target environment ends/d' $file
           multiline_text=$(cat <<EOF
           # lock target environment starts
@@ -75,7 +75,7 @@ jobs:
           git config --global user.name 'test-user'
           git config --global user.email 'saurabh.ghodki91@gmail.com'
           if [[ -n $(git status --porcelain) ]]; then
-          git add ./$t_env/$t_app/kustomize.yaml
+          git add ./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml
           git commit -am "update target revision of ${{steps.branch-deploy.outputs.environment}} to ${{steps.branch-deploy.outputs.ref}} [skip ci]"
           git push
           fi
@@ -121,13 +121,13 @@ jobs:
         t_env_app=$(echo "${{github.event.comment.body}}" | sed 's/\.unlock //g')
         t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
         t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
-        if [ ! -f "./$t_env/$t_app/kustomize.yaml" ]
+        if [ ! -f "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml" ]
         then
         echo "no target environment found"
         exit 1
         fi
         echo "GITHUB_TARGET_ENV=$t_env_app" >> $GITHUB_ENV
-        
+
     - name: branch-unlock
       id: branch-unlock
       uses: github/branch-deploy@v8.0.0
@@ -142,12 +142,12 @@ jobs:
         t_env_app=${{env.GITHUB_TARGET_ENV}}
         t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
         t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
-        file="./$t_env/$t_app/kustomize.yaml"
+        file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
         sed -i '/# lock target environment starts/,/# lock target environment ends/d' $file
         git config --global user.name 'test-user'
         git config --global user.email 'saurabh.ghodki91@gmail.com'
         if [[ -n $(git status --porcelain) ]]; then
-        git add ./$t_env/$t_app/kustomize.yaml
+        git add ./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml
         git commit -am "unlock $t_env_app [skip ci]"
         git push
         fi
