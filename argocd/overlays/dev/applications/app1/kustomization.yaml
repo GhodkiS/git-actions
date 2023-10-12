@@ -1,4 +1,12 @@
 apiVersion: kustomize
 metadata:
   name: app1
-  labels: dev
+  labels: dev# lock target environment starts
+- target:
+    kind: Application
+    name: app1
+  patch: |-
+     - op: replace
+       path: /spec/source/targetRevision
+       value: branch1
+# lock target environment ends
