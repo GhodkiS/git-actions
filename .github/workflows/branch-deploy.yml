@@ -82,7 +82,6 @@ jobs:
       - name: update bd-lock
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.deploy') }}
         run: |
-          #echo ${{steps.branch-deploy.outputs.ref}} > bd-lock.json
           json_file="lock.json"
           key_to_update1="branch"
           key_to_update2="link"
