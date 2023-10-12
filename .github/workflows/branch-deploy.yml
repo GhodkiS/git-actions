@@ -71,7 +71,7 @@ jobs:
           git config --global user.email 'saurabh.ghodki91@gmail.com'
           if [[ -n $(git status --porcelain) ]]; then
           git add ./$t_env/$t_app/kustomize.yaml
-          git commit -am "update target revision of ${{steps.branch-deploy.outputs.environment}} to ${{steps.branch-deploy.outputs.ref}}"
+          git commit -am "update target revision of ${{steps.branch-deploy.outputs.environment}} to ${{steps.branch-deploy.outputs.ref}} [skip ci]"
           git push
           fi
         
@@ -96,7 +96,7 @@ jobs:
           git config --global user.name 'test-user'
           git config --global user.email 'tech.user@company.com'
           git add "$json_file"
-          git commit -am "update branch target"
+          git commit -am "update branch target [skip ci]"
           git push
 
   unlock:
@@ -135,6 +135,6 @@ jobs:
         git config --global user.email 'saurabh.ghodki91@gmail.com'
         if [[ -n $(git status --porcelain) ]]; then
         git add ./$t_env/$t_app/kustomize.yaml
-        git commit -am "unlock $t_env_app"
+        git commit -am "unlock $t_env_app [skip ci]"
         git push
         fi

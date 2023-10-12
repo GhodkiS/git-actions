@@ -77,5 +77,5 @@ jobs:
           sed -i '/# lock target environment starts/,/# lock target environment ends/d' $file
           git add ./$t_env/$t_app/kustomize.yaml
           done
-          git commit -am "unlock $t_env_app"
+          git commit -am "unlock $t_env_app [skip ci]"
           git push
