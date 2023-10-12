@@ -61,7 +61,7 @@ jobs:
           active_locks=${{env.GITHUB_ACTIVE_LOCKS}}
           for t_branches in $(echo $active_locks | sed "s/,/ /g")
           do
-          git push origin --delete "${{t_branches}}-branch-deploy-lock"
+          git push origin --delete "${t_branches}-branch-deploy-lock"
           done
 
       - name: unlock-action
