@@ -5,5 +5,5 @@
   patch: |-
      - op: replace
        path: /spec/source/targetRevision
-       value: SREDEV-1234
+       value: SREDEV-6789
 # lock target environment ends
