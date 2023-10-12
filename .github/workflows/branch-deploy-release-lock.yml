@@ -65,7 +65,7 @@ jobs:
           done
 
       - name: commit unlock in main
-        if: ${{env.GITHUB_ACTIVE_LOCKS}} != ""
+        if: env.GITHUB_ACTIVE_LOCKS != ''
         run: |
           git config --global user.name 'test-user'
           git config --global user.email 'saurabh.ghodki91@gmail.com'
