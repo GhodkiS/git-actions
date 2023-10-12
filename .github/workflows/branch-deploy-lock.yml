@@ -59,9 +59,9 @@ jobs:
           git config --global user.name 'test-user'
           git config --global user.email 'saurabh.ghodki91@gmail.com'
           active_locks=${{env.GITHUB_ACTIVE_LOCKS}}
-          for t_env_app in $(echo $active_locks | sed "s/,/ /g")
+          for t_branches in $(echo $active_locks | sed "s/,/ /g")
           do
-          git push origin --delete "${{t_env_app}}-branch-deploy-lock"
+          git push origin --delete "${{t_branches}}-branch-deploy-lock"
           done
 
       - name: unlock-action
