@@ -126,7 +126,8 @@ jobs:
         echo "no target environment found"
         exit 1
         fi
-        echo "GITHUB_TARGET_ENV=$t_env" >> $GITHUB_ENV
+        echo "GITHUB_TARGET_ENV=$t_env_app" >> $GITHUB_ENV
+        
     - name: branch-unlock
       id: branch-unlock
       uses: github/branch-deploy@v8.0.0
