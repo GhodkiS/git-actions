@@ -1,2 +1,3 @@
 changes from branch 1
 changes from branch 1
+configurations from branch2
