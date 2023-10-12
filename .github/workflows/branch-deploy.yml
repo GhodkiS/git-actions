@@ -69,10 +69,11 @@ jobs:
           echo "$multiline_text" >> "$file"
           git config --global user.name 'test-user'
           git config --global user.email 'saurabh.ghodki91@gmail.com'
+          if [[ -n $(git status --porcelain) ]]; then
           git add ./$t_env/$t_app/kustomize.yaml
           git commit -am "update target revision of ${{steps.branch-deploy.outputs.environment}} to ${{steps.branch-deploy.outputs.ref}}"
           git push
-          echo $t_env_app >>  bd-${{steps.branch-deploy.outputs.ref}}
+          fi
         
       - uses: actions/checkout@v3
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.deploy') }}
@@ -81,7 +82,6 @@ jobs:
       - name: update bd-lock
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.deploy') }}
         run: |
-          #echo ${{steps.branch-deploy.outputs.ref}} > bd-lock.json
           json_file="lock.json"
           key_to_update1="branch"
           key_to_update2="link"
@@ -133,6 +133,8 @@ jobs:
         sed -i '/# lock target environment starts/,/# lock target environment ends/d' $file
         git config --global user.name 'test-user'
         git config --global user.email 'saurabh.ghodki91@gmail.com'
+        if [[ -n $(git status --porcelain) ]]; then
         git add ./$t_env/$t_app/kustomize.yaml
         git commit -am "unlock $t_env_app"
         git push
+        fi
