@@ -1,4 +1,4 @@
-name: branch-deploy-lock
+name: branch-deploy-release-lock
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ permissions:
   checks: read
 
 jobs:
-  branch-deploy-lock:
+  branch-deploy-release-lock:
       runs-on: ubuntu-latest
       steps:
       - name: checkout-main
@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: main
-      - name: list branches
+      - name: search active locks
         run: |
           json_file="lock.json"
           key_to_update="branch"
@@ -45,16 +45,16 @@ jobs:
           fi
           git checkout main
 
-      - name: unlock on merge
-        if: github.event.pull_request.merged == true
+      - name: unlock on PR merge
+        if: ${{github.event.pull_request.merged == true && ${{env.GITHUB_ACTIVE_LOCKS}} != ""}}
         uses: github/branch-deploy@v8.0.0
         id: unlock-on-merge
         with:
           unlock_on_merge_mode: "true"
           environment_targets: ${{env.GITHUB_ACTIVE_LOCKS}}
 
-      - name: checkout-main-unlock
-        if: github.event.pull_request.merged == false
+      - name: unlock on PR close
+        if: ${{github.event.pull_request.merged == false && ${{env.GITHUB_ACTIVE_LOCKS}} != ""}}
         run: |
           git config --global user.name 'test-user'
           git config --global user.email 'saurabh.ghodki91@gmail.com'
@@ -64,7 +64,8 @@ jobs:
           git push origin --delete "${t_branches}-branch-deploy-lock"
           done
 
-      - name: unlock-action
+      - name: commit unlock in main
+        if: ${{env.GITHUB_ACTIVE_LOCKS}} != ""
         run: |
           git config --global user.name 'test-user'
           git config --global user.email 'saurabh.ghodki91@gmail.com'
@@ -77,5 +78,5 @@ jobs:
           sed -i '/# lock target environment starts/,/# lock target environment ends/d' $file
           git add ./$t_env/$t_app/kustomize.yaml
           done
-          git commit -am "unlock $t_env_app"
+          git commit -am "unlock $t_env_app [skip ci]"
           git push
