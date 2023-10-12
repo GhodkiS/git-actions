@@ -21,17 +21,27 @@ jobs:
       (contains(github.event.comment.body, '.lock') && contains(github.event.comment.body, '--info')))  }}
      
     steps:
-      # The branch-deploy Action
-      - name: create-env-target-deploy
-        id: create-env-target-deploy
+      - name: checkout to main
+        uses: actions/checkout@v3
+        with:
+          ref: main
+
+      - name: validate target environment
         run: |
           if [[ "${{github.event.comment.body}}" == ".deploy"* ]]
           then
-              t_env=$(echo "${{github.event.comment.body}}" | sed 's/\.deploy //g')
+              t_env_app=$(echo "${{github.event.comment.body}}" | sed 's/\.deploy //g')
+              t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
+              t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
+              if [ ! -d "./$t_env/$t_app/kustomize.yaml" ]
+              then
+              echo "no target environment found"
+              exit 1
+              fi
           else
-              t_env=$(echo "${{github.event.comment.body}}" | sed 's/\.lock //g' | sed 's/--info//g' )
+              t_env_app=$(echo "${{github.event.comment.body}}" | sed 's/\.lock //g' | sed 's/--info//g' )
           fi
-          echo "GITHUB_TARGET_ENV=$t_env" >> $GITHUB_ENV
+          echo "GITHUB_TARGET_ENV=$t_env_app" >> $GITHUB_ENV
       - name: branch-deploy
         id: branch-deploy
         uses: github/branch-deploy@v8.0.0
@@ -40,11 +50,6 @@ jobs:
           trigger: '.deploy'
           disable_naked_commands: "true" 
           sticky_locks: "true"
-
-        # If the branch-deploy Action was triggered, checkout our branch
-      - uses: actions/checkout@v3
-        with:
-          ref: main
           
       - name: update target revision
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && contains(github.event.comment.body, '.deploy') }}
@@ -106,10 +111,21 @@ jobs:
       ${{ github.event.issue.pull_request &&
       contains(github.event.comment.body, '.unlock') }}
     steps:
-    - name: create-env-target-unlock
-      id: create-env-target-unlock
+    - name: checkout to main
+      uses: actions/checkout@v3
+      with:
+        ref: main
+
+    - name: validate target environment
       run: |
-        t_env=$(echo "${{github.event.comment.body}}" | sed 's/\.unlock //g')
+        t_env_app=$(echo "${{github.event.comment.body}}" | sed 's/\.unlock //g')
+        t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
+        t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
+        if [ ! -d "./$t_env/$t_app/kustomize.yaml" ]
+        then
+        echo "no target environment found"
+        exit 1
+        fi
         echo "GITHUB_TARGET_ENV=$t_env" >> $GITHUB_ENV
     - name: branch-unlock
       id: branch-unlock
@@ -120,10 +136,6 @@ jobs:
         disable_naked_commands: "true" 
         sticky_locks: "true"
 
-        # If the branch-deploy Action was triggered, checkout our branch
-    - uses: actions/checkout@v3
-      with:
-        ref: main
     - name: unlock-action
       run: |
         t_env_app=${{env.GITHUB_TARGET_ENV}}
