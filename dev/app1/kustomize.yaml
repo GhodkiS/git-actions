@@ -1,1 +1,9 @@
-
+# lock target environment starts
+- target:
+    kind: Application
+    name: app1
+  patch: |-
+     - op: replace
+       path: /spec/source/targetRevision
+       value: SREDEV-6789
+# lock target environment ends
