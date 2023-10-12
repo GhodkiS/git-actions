@@ -33,7 +33,7 @@ jobs:
               t_env_app=$(echo "${{github.event.comment.body}}" | sed 's/\.deploy //g')
               t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
               t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
-              if [ ! -d "./$t_env/$t_app/kustomize.yaml" ]
+              if [ ! -f "./$t_env/$t_app/kustomize.yaml" ]
               then
               echo "no target environment found"
               exit 1
@@ -121,7 +121,7 @@ jobs:
         t_env_app=$(echo "${{github.event.comment.body}}" | sed 's/\.unlock //g')
         t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
         t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
-        if [ ! -d "./$t_env/$t_app/kustomize.yaml" ]
+        if [ ! -f "./$t_env/$t_app/kustomize.yaml" ]
         then
         echo "no target environment found"
         exit 1
