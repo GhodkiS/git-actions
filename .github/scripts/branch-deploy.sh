@@ -7,7 +7,8 @@ elif [ "$comment_body" == ".unlock"* ]; then
 t_env_app=$(echo "$comment_body" | sed 's/\.unlock //g')
 elif [ "$comment_body" == ".lock"* ]; then
 t_env_app=$(echo "$comment_body" | sed 's/\.lock //g'| sed 's/ --info//g' )
-echo $t_env_app
+echo "in if loop"
+echo "comment body: $comment_body"
 fi
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
