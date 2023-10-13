@@ -22,7 +22,6 @@ echo "GITHUB_TARGET_ENV=$t_env_app" >> $GITHUB_OUTPUT
 
 
 elif [[ "$1" == "update-target-revision" ]]; then
-t_env_app="$2"
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
 file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
@@ -35,7 +34,7 @@ multiline_text=$(cat <<EOF
 patch: |-
     - op: replace
         path: /spec/source/targetRevision
-        value: $3
+        value: $t_branch
 # lock target environment ends
 EOF
 )
@@ -44,7 +43,7 @@ git config --global user.name 'test-user'
 git config --global user.email 'saurabh.ghodki91@gmail.com'
 if [[ -n $(git status --porcelain) ]]; then
 git add ./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml
-git commit -am "update target revision of $2 to $3 [skip ci]"
+git commit -am "update target revision of $t_env_app to $t_branch [skip ci]"
 git push
 fi
 
@@ -53,8 +52,8 @@ elif [[ "$1" == "update-lock-json" ]]; then
 json_file="lock.json"
 key_to_update1="branch"
 key_to_update2="link"
-new_value1=$3
-new_value2=$2
+new_value1=$t_branch
+new_value2=$comment_url
 json_content=$(cat "$json_file")
 updated_json=$(echo "$json_content" | jq --arg key "$key_to_update1" --arg value "$new_value1" '.[$key] = $value')
 echo "$updated_json" > "$json_file"

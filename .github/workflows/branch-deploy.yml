@@ -24,11 +24,13 @@ jobs:
           ref: main
 
       - name: Make the script files executable
-        run: chmod +x ./scripts/branch-deploy.sh
+        run: chmod +x ./.github/scripts/branch-deploy.sh
       
       - name: validate environment
         id: validate-environment
-        run: ./scripts/branch-deploy.sh "validate-environment" ${{github.event.comment.body}}
+        run: ./.github/scripts/branch-deploy.sh "validate-environment"
+        env:
+          comment_body: ${{github.event.comment.body}}
 
       - name: branch-deploy
         id: branch-deploy
@@ -40,15 +42,23 @@ jobs:
           
       - name: update target revision
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
-        run: ./scripts/branch-deploy.sh "update-target-revision" ${{steps.branch-deploy.outputs.environment}} ${{steps.branch-deploy.outputs.ref}}
+        run: ./.github/scripts/branch-deploy.sh "update-target-revision"
+        env:
+          t_env_app: ${{steps.branch-deploy.outputs.environment}}
+          t_branch: ${{steps.branch-deploy.outputs.ref}}
         
       - uses: actions/checkout@v3
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
         with:
-          ref: ${{steps.branch-deploy.outputs.environment}}-branch-deploy-lock    
+          ref: ${{steps.branch-deploy.outputs.environment}}-branch-deploy-lock   
+
       - name: update lock json
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
-        run: ./scripts/branch-deploy.sh "update-lock-json" ${{github.event.comment.html_url}} ${{steps.branch-deploy.outputs.ref}}
+        run: ./.github/scripts/branch-deploy.sh "update-lock-json"
+        env:
+          comment_url: ${{github.event.comment.html_url}}
+          t_branch: ${{steps.branch-deploy.outputs.ref}}
+
 
   unlock:
     name: unlock
