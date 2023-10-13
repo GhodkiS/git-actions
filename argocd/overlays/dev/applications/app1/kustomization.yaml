@@ -5,7 +5,7 @@ metadata:
 - target:
     kind: Application
     name: app1
-patch: |-
+  patch: |-
     - op: replace
         path: /spec/source/targetRevision
         value: branch1
