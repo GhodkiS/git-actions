@@ -38,7 +38,12 @@ multiline_text=$(cat <<EOF
 # lock target environment ends
 EOF
 )
-echo "$multiline_text" >> "$file"
+if [ -n "$(tail -c 1 $file)" ]; then
+    echo -e "\n$multiline_text" >> "$file"
+else
+    echo -e "$multiline_text" >> "$file"
+fi
+
 git config --global user.name 'test-user'
 git config --global user.email 'saurabh.ghodki91@gmail.com'
 if [[ -n $(git status --porcelain) ]]; then
