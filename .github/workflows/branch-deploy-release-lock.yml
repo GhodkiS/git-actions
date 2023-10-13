@@ -22,61 +22,26 @@ jobs:
         with:
           fetch-depth: 0
           ref: main
-      - name: search active locks
-        run: |
-          json_file="lock.json"
-          key_to_update="branch"
-          for branch in $(git branch -r | grep "\-branch\-deploy\-lock");
-          do
-          git checkout $branch
-          lock_branch=$(jq -r ".branch" "$json_file" 2> /dev/null)
-          lock_env=$(jq -r ".environment" "$json_file" 2> /dev/null)
-          if [[ "$lock_branch" == "${{ github.head_ref }}" ]]
-          then
-          git_active_lock_flag=true
-          git_active_lock="${git_active_lock},${lock_env}"
-          fi
-          done
-          if [[ "${git_active_lock_flag}" = true ]]
-          then
-          git_active_lock=$(echo $git_active_lock | cut -c2-)
-          echo "found active locks: ${git_active_lock}"
-          echo "GITHUB_ACTIVE_LOCKS=$git_active_lock" >> $GITHUB_ENV
-          fi
-          git checkout main
+          
+      - name: Make the script files executable
+        run: chmod +x ./scripts/branch-deploy.sh
+
+      - name: search locks
+        id: search-locks
+        run: ./scripts/branch-deploy.sh "search-locks" ${{ github.head_ref }}
 
       - name: unlock on PR merge
-        if: ${{github.event.pull_request.merged == true && env.GITHUB_ACTIVE_LOCKS != ''}}
+        if: ${{github.event.pull_request.merged == true && steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS != ''}}
         uses: github/branch-deploy@v8.0.0
         id: unlock-on-merge
         with:
           unlock_on_merge_mode: "true"
-          environment_targets: ${{env.GITHUB_ACTIVE_LOCKS}}
+          environment_targets: ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}
 
-      - name: unlock on PR close
-        if: ${{github.event.pull_request.merged == false && env.GITHUB_ACTIVE_LOCKS != ''}}
-        run: |
-          git config --global user.name 'test-user'
-          git config --global user.email 'saurabh.ghodki91@gmail.com'
-          active_locks=${{env.GITHUB_ACTIVE_LOCKS}}
-          for t_branches in $(echo $active_locks | sed "s/,/ /g")
-          do
-          git push origin --delete "${t_branches}-branch-deploy-lock"
-          done
+      - name: unlock pr close
+        if: ${{github.event.pull_request.merged == false && steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS != ''}}
+        run: ./scripts/branch-deploy.sh "unlock-pr-close" ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}
 
-      - name: commit unlock in main
-        if: env.GITHUB_ACTIVE_LOCKS != ''
-        run: |
-          git config --global user.name 'test-user'
-          git config --global user.email 'saurabh.ghodki91@gmail.com'
-          active_locks=${{env.GITHUB_ACTIVE_LOCKS}}
-          for t_env_app in $(echo $active_locks | sed "s/,/ /g")
-          do
-          t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
-          t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
-          file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
-          sed -i '/# lock target environment starts/,/# lock target environment ends/d' $file
-          git add ./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml
-          done
-          git commit -am "unlock $t_env_app [skip ci]"
-          git push
+      - name: commit unlock main
+        if: steps.search-active-locks.outputs.GITHUB_ACTIVE_LOCKS != ''
+        run: ./scripts/branch-deploy.sh "commit-unlock-main" ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}
