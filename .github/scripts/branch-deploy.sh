@@ -89,7 +89,7 @@ do
 git checkout $branch
 lock_branch=$(jq -r ".branch" "$json_file" 2> /dev/null)
 lock_env=$(jq -r ".environment" "$json_file" 2> /dev/null)
-if [[ "$lock_branch" == "$2" ]]
+if [[ "$lock_branch" == "$t_branch" ]]
 then
 git_active_lock_flag=true
 git_active_lock="${git_active_lock},${lock_env}"
@@ -107,7 +107,6 @@ git checkout main
 elif [[ "$1" == "unlock-pr-close" ]]; then
 git config --global user.name 'test-user'
 git config --global user.email 'saurabh.ghodki91@gmail.com'
-active_locks="$2"
 for t_branches in $(echo $active_locks | sed "s/,/ /g")
 do
 git push origin --delete "${t_branches}-branch-deploy-lock"
@@ -117,7 +116,6 @@ done
 elif [[ "$1" == "commit-unlock-main" ]]; then
 git config --global user.name 'test-user'
 git config --global user.email 'saurabh.ghodki91@gmail.com'
-active_locks="$2"
 for t_env_app in $(echo $active_locks | sed "s/,/ /g")
 do
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
