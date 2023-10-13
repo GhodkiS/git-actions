@@ -39,6 +39,9 @@ jobs:
           environment_targets: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
           trigger: '.deploy'
           sticky_locks: "true"
+          update_branch: force
+          skip_ci: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
+          skip_reviews: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
           
       - name: update target revision
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}

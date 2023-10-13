@@ -47,7 +47,7 @@ jobs:
           active_locks: ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}
 
       - name: commit unlock main
-        if: steps.search-active-locks.outputs.GITHUB_ACTIVE_LOCKS != ''
+        if: steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS != ''
         run: ./.github/scripts/branch-deploy.sh "commit-unlock-main"
         env:
           active_locks: ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}
