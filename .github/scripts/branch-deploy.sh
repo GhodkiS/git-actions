@@ -1,11 +1,11 @@
 #!/bin/bash
 
 if [ "$1" == "validate-environment" ]; then
-if [ "$2" == ".deploy"* ]; then
+if [ "$comment_body" == ".deploy"* ]; then
 t_env_app=$(echo "$comment_body" | sed 's/\.deploy //g')
-elif [ "$2" == ".unlock"* ]; then
+elif [ "$comment_body" == ".unlock"* ]; then
 t_env_app=$(echo "$comment_body" | sed 's/\.unlock //g')
-elif [ "$2" == ".lock"* ]; then
+elif [ "$comment_body" == ".lock"* ]; then
 t_env_app=$(echo "$comment_body" | sed 's/\.lock //g'| sed 's/ --info//g' )
 echo $t_env_app
 fi
