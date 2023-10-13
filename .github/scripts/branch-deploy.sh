@@ -1,6 +1,7 @@
 #!/bin/bash
 
 if [ "$1" == "validate-environment" ]; then
+echo $2
 if [ "$2" == ".deploy"* ]; then
 t_env_app=$(echo "$2" | sed 's/\.deploy //g')
 elif [ "$2" == ".unlock"* ]; then
