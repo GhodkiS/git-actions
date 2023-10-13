@@ -1,6 +1,7 @@
 #!/bin/bash
 
 if [ "$1" == "validate-environment" ]; then
+echo "comment body from script:$comment_body"
 if [ "$2" == ".deploy"* ]; then
 t_env_app=$(echo "$comment_body" | sed 's/\.deploy //g')
 elif [ "$2" == ".unlock"* ]; then
