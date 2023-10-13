@@ -64,7 +64,9 @@ jobs:
 
     - name: validate environment
       id: validate-environment
-      run: ./scripts/branch-deploy.sh "validate-environment" ${{github.event.comment.body}}
+      run: ./scripts/branch-deploy.sh "validate-environment"
+      env:
+        comment_body: ${{github.event.comment.body}}
 
     - name: branch-unlock
       id: branch-unlock
@@ -76,7 +78,10 @@ jobs:
         sticky_locks: "true"
 
     - name: unlock-action
-      run: ./scripts/branch-deploy.sh "unlock-action" ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
+      run: ./scripts/branch-deploy.sh "unlock-action"
+      env:
+        t_env_app: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
+
 
   lock-info:
     name: lock-info

@@ -21,7 +21,7 @@ echo "GITHUB_TARGET_ENV=$t_env_app" >> $GITHUB_OUTPUT
 
 
 
-elif [ "$1" == "update-target-revision" ]; then
+elif [[ "$1" == "update-target-revision" ]]; then
 t_env_app="$2"
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
@@ -49,7 +49,7 @@ git push
 fi
 
 
-elif [ "$1" == "update-lock-json" ]; then
+elif [[ "$1" == "update-lock-json" ]]; then
 json_file="lock.json"
 key_to_update1="branch"
 key_to_update2="link"
@@ -68,8 +68,7 @@ git commit -am "update branch target [skip ci]"
 git push
 
 
-elif [ "$1" == "unlock-action" ]; then
-t_env_app="$2"
+elif [[ "$1" == "unlock-action" ]]; then
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
 file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
@@ -106,7 +105,7 @@ fi
 git checkout main
 
 
-elif [ "$1" == "unlock-pr-close" ]; then
+elif [[ "$1" == "unlock-pr-close" ]]; then
 git config --global user.name 'test-user'
 git config --global user.email 'saurabh.ghodki91@gmail.com'
 active_locks="$2"
@@ -116,7 +115,7 @@ git push origin --delete "${t_branches}-branch-deploy-lock"
 done
 
 
-elif [ "$1" == "commit-unlock-main" ]; then
+elif [[ "$1" == "commit-unlock-main" ]]; then
 git config --global user.name 'test-user'
 git config --global user.email 'saurabh.ghodki91@gmail.com'
 active_locks="$2"
