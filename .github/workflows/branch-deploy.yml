@@ -93,7 +93,9 @@ jobs:
       
       - name: validate environment
         id: validate-environment
-        run: ./.github/scripts/branch-deploy.sh "validate-environment" ${{github.event.comment.body}}
+        run: ./.github/scripts/branch-deploy.sh "validate-environment" 
+        env:
+          comment_body: ${{github.event.comment.body}}
 
       - name: lock-info
         id: lock-info

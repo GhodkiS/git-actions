@@ -1,13 +1,12 @@
 #!/bin/bash
 
 if [ "$1" == "validate-environment" ]; then
-echo $2
 if [ "$2" == ".deploy"* ]; then
-t_env_app=$(echo "$2" | sed 's/\.deploy //g')
+t_env_app=$(echo "$comment_body" | sed 's/\.deploy //g')
 elif [ "$2" == ".unlock"* ]; then
-t_env_app=$(echo "$2" | sed 's/\.unlock //g')
+t_env_app=$(echo "$comment_body" | sed 's/\.unlock //g')
 elif [ "$2" == ".lock"* ]; then
-t_env_app=$(echo "$2" | sed 's/\.lock //g'| sed 's/--info//g' )
+t_env_app=$(echo "$comment_body" | sed 's/\.lock //g'| sed 's/--info//g' )
 echo $t_env_app
 fi
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
