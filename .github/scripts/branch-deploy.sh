@@ -31,7 +31,7 @@ multiline_text=$(cat <<EOF
 - target:
     kind: Application
     name: $t_app
-patch: |-
+  patch: |-
     - op: replace
         path: /spec/source/targetRevision
         value: $t_branch
