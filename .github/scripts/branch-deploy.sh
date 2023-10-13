@@ -1,21 +1,20 @@
 #!/bin/bash
 
 if [ "$1" == "validate-environment" ]; then
+if [ "$2" == ".deploy"* ]; then
+t_env_app=$(echo "$2" | sed 's/\.deploy //g')
+elif [ "$2" == ".unlock"* ]; then
+t_env_app=$(echo "$2" | sed 's/\.unlock //g')
+elif [ "$2" == ".lock"* ]; then
+t_env_app=$(echo "$2" | sed 's/\.lock //g'| sed 's/--info//g' )
+fi
+t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
+t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
+if [ ! -f "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml" ]
 then
-    if [ "$2" == ".deploy"* ]; then
-    t_env_app=$(echo "$2" | sed 's/\.deploy //g')
-    elif [ "$2" == ".unlock"* ]; then
-    t_env_app=$(echo "$2" | sed 's/\.unlock //g')
-    elif [ "$2" == ".lock"* ]; then
-    t_env_app=$(echo "$2" | sed 's/\.lock //g'| sed 's/--info//g' )
-    fi
-    t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
-    t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
-    if [ ! -f "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml" ]
-    then
-    echo "no target environment found"
-    exit 1
-    fi
+echo "no target environment found"
+exit 1
+fi
 echo "GITHUB_TARGET_ENV=$t_env_app" >> $GITHUB_OUTPUT
 
 
