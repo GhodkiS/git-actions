@@ -74,11 +74,10 @@ jobs:
       with:
         environment_targets: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
         trigger: '.deploy'
-        disable_naked_commands: "true" 
         sticky_locks: "true"
 
     - name: unlock-action
-      run: ./scripts/branch-deploy.sh "unlock-action"
+      run: ./.github/scripts/branch-deploy.sh "unlock-action"
       env:
         t_env_app: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
 
