@@ -60,11 +60,11 @@ jobs:
       with:
         ref: main
     - name: Make the script files executable
-      run: chmod +x ./scripts/branch-deploy.sh
+      run: chmod +x ./github/scripts/branch-deploy.sh
 
     - name: validate environment
       id: validate-environment
-      run: ./scripts/branch-deploy.sh "validate-environment"
+      run: ./github/scripts/branch-deploy.sh "validate-environment"
       env:
         comment_body: ${{github.event.comment.body}}
 
