@@ -1,20 +1,19 @@
 #!/bin/bash
 
 if [ "$1" == "validate-environment" ]; then
-echo "comment body from script:$comment_body"
 if [ "$2" == ".deploy"* ]; then
 t_env_app=$(echo "$comment_body" | sed 's/\.deploy //g')
 elif [ "$2" == ".unlock"* ]; then
 t_env_app=$(echo "$comment_body" | sed 's/\.unlock //g')
 elif [ "$2" == ".lock"* ]; then
-t_env_app=$(echo "$comment_body" | sed 's/\.lock //g'| sed 's/--info//g' )
+t_env_app=$(echo "$comment_body" | sed 's/\.lock //g'| sed 's/ --info//g' )
 echo $t_env_app
 fi
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
 if [ ! -f "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml" ]
 then
-echo "no target environment found"
+echo "no $t_env_app target  environment found"
 exit 1
 fi
 echo "GITHUB_TARGET_ENV=$t_env_app" >> $GITHUB_OUTPUT
