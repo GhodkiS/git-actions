@@ -7,7 +7,7 @@ elif [[ "$COMMENT_BODY" == ".unlock"* ]]; then
 t_env_app="${COMMENT_BODY//.unlock /}"
 elif [[ "$COMMENT_BODY" == ".lock"* ]]; then
 t_env_app_temp="${COMMENT_BODY//.lock /}"
-t_env_app="${t_env_app_temp/--info/}"
+t_env_app="${t_env_app_temp/ --info/}"
 echo "in if loop"
 echo "comment body: $COMMENT_BODY"
 fi
