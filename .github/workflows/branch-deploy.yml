@@ -1,6 +1,6 @@
 name: branch-deploy
 
-on:
+'on':
   issue_comment:
     types: [created]
 
@@ -16,7 +16,7 @@ jobs:
     name: deploy
     runs-on: ubuntu-latest
     if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '.deploy')}}
-     
+
     steps:
       - name: checkout to main
         uses: actions/checkout@v3
@@ -25,12 +25,12 @@ jobs:
 
       - name: Make the script files executable
         run: chmod +x ./.github/scripts/branch-deploy.sh
-      
+
       - name: validate environment
         id: validate-environment
         run: ./.github/scripts/branch-deploy.sh "validate-environment"
         env:
-          comment_body: ${{github.event.comment.body}}
+          COMMENT_BODY: ${{github.event.comment.body}}
 
       - name: branch-deploy
         id: branch-deploy
@@ -42,28 +42,28 @@ jobs:
           update_branch: disabled
           skip_ci: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
           skip_reviews: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
-          
+
       - name: update target revision
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
         run: ./.github/scripts/branch-deploy.sh "update-target-revision"
         env:
           t_env_app: ${{steps.branch-deploy.outputs.environment}}
-          t_branch: ${{steps.branch-deploy.outputs.ref}}
-        
+          T_BRANCH: ${{steps.branch-deploy.outputs.ref}}
+
       - uses: actions/checkout@v3
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
         with:
-          ref: ${{steps.branch-deploy.outputs.environment}}-branch-deploy-lock 
+          ref: ${{steps.branch-deploy.outputs.environment}}-branch-deploy-lock
 
       - name: Make the script files executable on bd branch
-        run: chmod +x ./.github/scripts/branch-deploy.sh  
+        run: chmod +x ./.github/scripts/branch-deploy.sh
 
       - name: update lock json
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
         run: ./.github/scripts/branch-deploy.sh "update-lock-json"
         env:
-          comment_url: ${{github.event.comment.html_url}}
-          t_branch: ${{steps.branch-deploy.outputs.ref}}
+          COMMENT_URL: ${{github.event.comment.html_url}}
+          T_BRANCH: ${{steps.branch-deploy.outputs.ref}}
 
 
   unlock:
@@ -82,7 +82,7 @@ jobs:
       id: validate-environment
       run: ./.github/scripts/branch-deploy.sh "validate-environment"
       env:
-        comment_body: ${{github.event.comment.body}}
+        COMMENT_BODY: ${{github.event.comment.body}}
 
     - name: branch-unlock
       id: branch-unlock
@@ -110,12 +110,12 @@ jobs:
 
       - name: Make the script files executable
         run: chmod +x ./.github/scripts/branch-deploy.sh
-      
+
       - name: validate environment
         id: validate-environment
-        run: ./.github/scripts/branch-deploy.sh "validate-environment" 
+        run: ./.github/scripts/branch-deploy.sh "validate-environment"
         env:
-          comment_body: ${{github.event.comment.body}}
+          COMMENT_BODY: ${{github.event.comment.body}}
 
       - name: lock-info
         id: lock-info
@@ -124,4 +124,3 @@ jobs:
           environment_targets: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
           trigger: '.deploy'
           sticky_locks: "true"
-    
