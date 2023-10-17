@@ -81,6 +81,9 @@ echo "GITHUB_TARGET_ENV=$t_env_app" >> "${GITHUB_OUTPUT}"
 update-target-revision() {
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
+git config --global user.name 'test-user'
+git config --global user.email 'test-user@test.com'
+git switch -c "$t_env_app-merge-temp"
 file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
 sed -i '/# lock target environment starts/,/# lock target environment ends/d' "$file"
 multiline_text=$(cat <<EOF
@@ -102,13 +105,11 @@ else
     echo -e "$multiline_text" >> "{$file}"
 fi
 
-git config --global user.name 'test-user'
-git config --global user.email 'test-user@test.com'
-if [[ -n $(git status --porcelain) ]]; then
-git add "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
-git commit -am "update target revision of $t_env_app to $T_BRANCH [skip ci]"
-git push
-fi
+# if [[ -n $(git status --porcelain) ]]; then
+# git add "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
+# git commit -am "update target revision of $t_env_app to $T_BRANCH [skip ci]"
+# git push
+# fi
 }
 
 update-lock-json() {
