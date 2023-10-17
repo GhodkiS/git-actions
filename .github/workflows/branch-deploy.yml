@@ -60,7 +60,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             github.checks.create({
-              name: 'Status check one',
+              name: 'status-check-temp',
               head_sha: '${{ steps.commit.outputs.commit_hash }}',
               status: 'completed',
               conclusion: 'success',
