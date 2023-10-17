@@ -172,9 +172,10 @@ for t_branches in ${ACTIVE_LOCKS//,/ }
 do
 git push origin --delete "${t_branches}-branch-deploy-lock"
 done
+}
 
 
-elif [[ "$1" == "commit-unlock-main" ]]; then
+commit-unlock-main() {
 git config --global user.name 'test-user'
 git config --global user.email 'test-user@test.com'
 for t_env_app in ${ACTIVE_LOCKS//,/ }
@@ -187,7 +188,6 @@ git add "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
 done
 git commit -am "unlock $t_env_app [skip ci]"
 git push
-fi
 }
 #===============================================================================================
 # MAIN
