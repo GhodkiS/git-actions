@@ -162,7 +162,7 @@ jobs:
       if: steps.commit.outputs.commit_hash != ''
       run: ./.github/scripts/branch-deploy.sh -a "cleanup"
       env:
-        T_ENV_APP: ${{steps.branch-deploy.outputs.environment}}
+        T_ENV_APP: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
 
 
 
