@@ -30,7 +30,7 @@ jobs:
         id: search-locks
         run: ./.github/scripts/branch-deploy.sh "search-locks"
         env:
-           t_branch: ${{ github.head_ref }}
+           T_BRANCH: ${{ github.head_ref }}
 
       - name: unlock on PR merge
         if: ${{github.event.pull_request.merged == true && steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS != ''}}
@@ -44,10 +44,10 @@ jobs:
         if: ${{github.event.pull_request.merged == false && steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS != ''}}
         run: ./.github/scripts/branch-deploy.sh "unlock-pr-close"
         env:
-          active_locks: ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}
+          ACTIVE_LOCKS: ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}
 
       - name: commit unlock main
         if: steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS != ''
         run: ./.github/scripts/branch-deploy.sh "commit-unlock-main"
         env:
-          active_locks: ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}
+          ACTIVE_LOCKS: ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}

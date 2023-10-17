@@ -1,14 +1,15 @@
 #!/bin/bash
 
 if [[ "$1" == "validate-environment" ]]; then
-if [[ "$comment_body" == ".deploy"* ]]; then
-t_env_app=$(echo "$comment_body" | sed 's/\.deploy //g')
-elif [[ "$comment_body" == ".unlock"* ]]; then
-t_env_app=$(echo "$comment_body" | sed 's/\.unlock //g')
-elif [[ "$comment_body" == ".lock"* ]]; then
-t_env_app=$(echo "$comment_body" | sed 's/\.lock //g'| sed 's/ --info//g' )
+if [[ "$COMMENT_BODY" == ".deploy"* ]]; then
+t_env_app="${COMMENT_BODY//.deploy /}"
+elif [[ "$COMMENT_BODY" == ".unlock"* ]]; then
+t_env_app="${COMMENT_BODY//.unlock /}"
+elif [[ "$COMMENT_BODY" == ".lock"* ]]; then
+t_env_app_temp="${COMMENT_BODY//.lock /}"
+t_env_app="${t_env_app_temp/ --info/}"
 echo "in if loop"
-echo "comment body: $comment_body"
+echo "comment body: $COMMENT_BODY"
 fi
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
@@ -17,7 +18,7 @@ then
 echo "no $t_env_app target  environment found"
 exit 1
 fi
-echo "GITHUB_TARGET_ENV=$t_env_app" >> $GITHUB_OUTPUT
+echo "GITHUB_TARGET_ENV=$t_env_app" >> "${GITHUB_OUTPUT}"
 
 
 
@@ -25,7 +26,7 @@ elif [[ "$1" == "update-target-revision" ]]; then
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
 file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
-sed -i '/# lock target environment starts/,/# lock target environment ends/d' $file
+sed -i '/# lock target environment starts/,/# lock target environment ends/d' "$file"
 multiline_text=$(cat <<EOF
 # lock target environment starts
 - target:
@@ -34,21 +35,22 @@ multiline_text=$(cat <<EOF
   patch: |-
     - op: replace
         path: /spec/source/targetRevision
-        value: $t_branch
+        value: $T_BRANCH
 # lock target environment ends
 EOF
 )
-if [ -n "$(tail -c 1 $file)" ]; then
-    echo -e "\n$multiline_text" >> "$file"
+tail_s=$(tail -c 1 "${file}")
+if [[ -n "$tail_s" ]]; then
+    echo -e "\n$multiline_text" >> "${file}"
 else
-    echo -e "$multiline_text" >> "$file"
+    echo -e "$multiline_text" >> "{$file}"
 fi
 
 git config --global user.name 'test-user'
-git config --global user.email 'saurabh.ghodki91@gmail.com'
+git config --global user.email 'test-user@test.com'
 if [[ -n $(git status --porcelain) ]]; then
-git add ./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml
-git commit -am "update target revision of $t_env_app to $t_branch [skip ci]"
+git add "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
+git commit -am "update target revision of $t_env_app to $T_BRANCH [skip ci]"
 git push
 fi
 
@@ -57,8 +59,8 @@ elif [[ "$1" == "update-lock-json" ]]; then
 json_file="lock.json"
 key_to_update1="branch"
 key_to_update2="link"
-new_value1=$t_branch
-new_value2=$comment_url
+new_value1=$T_BRANCH
+new_value2=$COMMENT_URL
 json_content=$(cat "$json_file")
 updated_json=$(echo "$json_content" | jq --arg key "$key_to_update1" --arg value "$new_value1" '.[$key] = $value')
 echo "$updated_json" > "$json_file"
@@ -76,11 +78,11 @@ elif [[ "$1" == "unlock-action" ]]; then
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
 file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
-sed -i '/# lock target environment starts/,/# lock target environment ends/d' $file
+sed -i '/# lock target environment starts/,/# lock target environment ends/d' "{$file}"
 git config --global user.name 'test-user'
-git config --global user.email 'saurabh.ghodki91@gmail.com'
+git config --global user.email 'test-user@test.com'
 if [[ -n $(git status --porcelain) ]]; then
-git add ./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml
+git add "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
 git commit -am "unlock $t_env_app [skip ci]"
 git push
 fi
@@ -88,13 +90,12 @@ fi
 
 elif [ "$1" == "search-locks" ]; then
 json_file="lock.json"
-key_to_update="branch"
 for branch in $(git branch -r | grep "\-branch\-deploy\-lock");
 do
-git checkout $branch
+git checkout "${branch}"
 lock_branch=$(jq -r ".branch" "$json_file" 2> /dev/null)
 lock_env=$(jq -r ".environment" "$json_file" 2> /dev/null)
-if [[ "$lock_branch" == "$t_branch" ]]
+if [[ "$lock_branch" == "$T_BRANCH" ]]
 then
 git_active_lock_flag=true
 git_active_lock="${git_active_lock},${lock_env}"
@@ -102,17 +103,16 @@ fi
 done
 if [[ "${git_active_lock_flag}" = true ]]
 then
-git_active_lock=$(echo $git_active_lock | cut -c2-)
-echo "found active locks: ${git_active_lock}"
-echo "GITHUB_ACTIVE_LOCKS=$git_active_lock" >> $GITHUB_OUTPUT
+echo "found active locks: ${git_active_lock/,/}"
+echo "GITHUB_ACTIVE_LOCKS=${git_active_lock/,/}" >> "${GITHUB_OUTPUT}"
 fi
 git checkout main
 
 
 elif [[ "$1" == "unlock-pr-close" ]]; then
 git config --global user.name 'test-user'
-git config --global user.email 'saurabh.ghodki91@gmail.com'
-for t_branches in $(echo $active_locks | sed "s/,/ /g")
+git config --global user.email 'test-user@test.com'
+for t_branches in ${ACTIVE_LOCKS//,/ }
 do
 git push origin --delete "${t_branches}-branch-deploy-lock"
 done
@@ -120,14 +120,14 @@ done
 
 elif [[ "$1" == "commit-unlock-main" ]]; then
 git config --global user.name 'test-user'
-git config --global user.email 'saurabh.ghodki91@gmail.com'
-for t_env_app in $(echo $active_locks | sed "s/,/ /g")
+git config --global user.email 'test-user@test.com'
+for t_env_app in ${ACTIVE_LOCKS//,/ }
 do
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
 file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
-sed -i '/# lock target environment starts/,/# lock target environment ends/d' $file
-git add ./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml
+sed -i '/# lock target environment starts/,/# lock target environment ends/d' "${file}"
+git add "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
 done
 git commit -am "unlock $t_env_app [skip ci]"
 git push
