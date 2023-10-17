@@ -141,7 +141,7 @@ unlock-action() {
 t_app=$(echo "$T_ENV_APP" | awk -F '_' '{print $1}')
 t_env=$(echo "$T_ENV_APP" | awk -F '_' '{print $2}')
 file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
-sed -i '/# lock target environment starts/,/# lock target environment ends/d' "{$file}"
+sed -i '/# lock target environment starts/,/# lock target environment ends/d' "${file}"
 git config --global user.name 'test-user'
 git config --global user.email 'test-user@test.com'
 if [[ -n $(git status --porcelain) ]]; then
