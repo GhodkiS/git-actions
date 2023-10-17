@@ -23,12 +23,9 @@ jobs:
         with:
           ref: main
 
-      - name: Make the script files executable
-        run: chmod +x ./.github/scripts/branch-deploy.sh
-
       - name: validate environment
         id: validate-environment
-        run: ./.github/scripts/branch-deploy.sh "validate-environment"
+        run: ./.github/scripts/branch-deploy.sh -a "validate-environment"
         env:
           COMMENT_BODY: ${{github.event.comment.body}}
 
@@ -45,7 +42,7 @@ jobs:
 
       - name: update target revision
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
-        run: ./.github/scripts/branch-deploy.sh "update-target-revision"
+        run: ./.github/scripts/branch-deploy.sh -a "update-target-revision"
         env:
           t_env_app: ${{steps.branch-deploy.outputs.environment}}
           T_BRANCH: ${{steps.branch-deploy.outputs.ref}}
@@ -54,9 +51,6 @@ jobs:
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
         with:
           ref: ${{steps.branch-deploy.outputs.environment}}-branch-deploy-lock
-
-      - name: Make the script files executable on bd branch
-        run: chmod +x ./.github/scripts/branch-deploy.sh
 
       - name: update lock json
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
@@ -75,12 +69,10 @@ jobs:
       uses: actions/checkout@v3
       with:
         ref: main
-    - name: Make the script files executable
-      run: chmod +x ./.github/scripts/branch-deploy.sh
 
     - name: validate environment
       id: validate-environment
-      run: ./.github/scripts/branch-deploy.sh "validate-environment"
+      run: ./.github/scripts/branch-deploy.sh -a "validate-environment"
       env:
         COMMENT_BODY: ${{github.event.comment.body}}
 
@@ -93,7 +85,7 @@ jobs:
         sticky_locks: "true"
 
     - name: unlock-action
-      run: ./.github/scripts/branch-deploy.sh "unlock-action"
+      run: ./.github/scripts/branch-deploy.sh -a "unlock-action"
       env:
         t_env_app: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
 
@@ -108,12 +100,9 @@ jobs:
         with:
           ref: main
 
-      - name: Make the script files executable
-        run: chmod +x ./.github/scripts/branch-deploy.sh
-
       - name: validate environment
         id: validate-environment
-        run: ./.github/scripts/branch-deploy.sh "validate-environment"
+        run: ./.github/scripts/branch-deploy.sh -a "validate-environment"
         env:
           COMMENT_BODY: ${{github.event.comment.body}}
 

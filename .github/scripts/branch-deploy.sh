@@ -1,6 +1,62 @@
 #!/bin/bash
 
-if [[ "$1" == "validate-environment" ]]; then
+usage() {
+  echo "Usage:"
+  echo "  $SCRIPT_NAME [ -a ACTION ]"
+  echo
+  echo "  -h - It shows this help"
+  echo
+  echo "  -a - Required option. The action to run the script with. E.g.: validate-environment"
+}
+
+exit_with_error() {
+  usage
+  exit 1
+}
+
+# set variables
+SCRIPT_NAME=$(basename "$0")
+
+## get parameters / options
+while getopts ":h:a:" opt;
+do
+  case ${opt} in
+    h )
+      echo
+      usage
+      exit 0
+      ;;
+    a )
+      if [ -z "$OPTARG" ] || [ "${OPTARG:0:1}" = "-" ]
+      then
+        echo "Error: -a requires an argument"
+        exit 1
+      fi
+      ACTION=$OPTARG
+      ;;
+    \? )
+      echo "Invalid Option: -$OPTARG" 1>&2
+      exit_with_error
+      ;;
+    : )
+      echo "Invalid Option: -$OPTARG requires an argument" 1>&2
+      exit_with_error
+      ;;
+  esac
+done
+
+## error handling
+
+if [ -z "$ACTION" ]
+then
+  echo "-a parameter not set"
+  exit_with_error
+fi
+
+#===============================================================================================
+# Functions
+
+validate-environment() {
 if [[ "$COMMENT_BODY" == ".deploy"* ]]; then
 t_env_app="${COMMENT_BODY//.deploy /}"
 elif [[ "$COMMENT_BODY" == ".unlock"* ]]; then
@@ -19,10 +75,10 @@ echo "no $t_env_app target  environment found"
 exit 1
 fi
 echo "GITHUB_TARGET_ENV=$t_env_app" >> "${GITHUB_OUTPUT}"
+}
 
 
-
-elif [[ "$1" == "update-target-revision" ]]; then
+update-target-revision() {
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
 file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
@@ -53,9 +109,9 @@ git add "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
 git commit -am "update target revision of $t_env_app to $T_BRANCH [skip ci]"
 git push
 fi
+}
 
-
-elif [[ "$1" == "update-lock-json" ]]; then
+update-lock-json() {
 json_file="lock.json"
 key_to_update1="branch"
 key_to_update2="link"
@@ -72,9 +128,9 @@ git config --global user.email 'tech.user@company.com'
 git add "$json_file"
 git commit -am "update branch target [skip ci]"
 git push
+}
 
-
-elif [[ "$1" == "unlock-action" ]]; then
+unlock-action() {
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
 file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
@@ -86,9 +142,9 @@ git add "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
 git commit -am "unlock $t_env_app [skip ci]"
 git push
 fi
+}
 
-
-elif [ "$1" == "search-locks" ]; then
+search-locks() {
 json_file="lock.json"
 for branch in $(git branch -r | grep "\-branch\-deploy\-lock");
 do
@@ -107,9 +163,9 @@ echo "found active locks: ${git_active_lock/,/}"
 echo "GITHUB_ACTIVE_LOCKS=${git_active_lock/,/}" >> "${GITHUB_OUTPUT}"
 fi
 git checkout main
+}
 
-
-elif [[ "$1" == "unlock-pr-close" ]]; then
+unlock-pr-close() {
 git config --global user.name 'test-user'
 git config --global user.email 'test-user@test.com'
 for t_branches in ${ACTIVE_LOCKS//,/ }
@@ -132,3 +188,33 @@ done
 git commit -am "unlock $t_env_app [skip ci]"
 git push
 fi
+}
+#===============================================================================================
+# MAIN
+
+case $ACTION in
+  validate-environment)
+   validate-environment
+   ;;
+ update-lock-json)
+   update-lock-json
+   ;;
+ update-target-revision)
+   update-target-revision
+   ;;
+ unlock-action)
+   unlock-action
+   ;;
+ search-locks)
+   search-locks
+   ;;
+ unlock-pr-close)
+   unlock-pr-close
+   ;;
+ commit-unlock-main)
+   commit-unlock-main
+   ;;
+ *)
+   exit_with_error
+   ;;
+esac

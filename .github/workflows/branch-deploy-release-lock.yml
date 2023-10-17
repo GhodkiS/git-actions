@@ -23,12 +23,9 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      - name: Make the script files executable
-        run: chmod +x ./.github/scripts/branch-deploy.sh
-
       - name: search locks
         id: search-locks
-        run: ./.github/scripts/branch-deploy.sh "search-locks"
+        run: ./.github/scripts/branch-deploy.sh -a "search-locks"
         env:
            T_BRANCH: ${{ github.head_ref }}
 
@@ -42,12 +39,12 @@ jobs:
 
       - name: unlock pr close
         if: ${{github.event.pull_request.merged == false && steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS != ''}}
-        run: ./.github/scripts/branch-deploy.sh "unlock-pr-close"
+        run: ./.github/scripts/branch-deploy.sh -a "unlock-pr-close"
         env:
           ACTIVE_LOCKS: ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}
 
       - name: commit unlock main
         if: steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS != ''
-        run: ./.github/scripts/branch-deploy.sh "commit-unlock-main"
+        run: ./.github/scripts/branch-deploy.sh -a "commit-unlock-main"
         env:
           ACTIVE_LOCKS: ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}
