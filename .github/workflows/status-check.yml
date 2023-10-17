@@ -1,0 +1,23 @@
+name: branch-deploy-release-lock
+
+'on':
+  pull_request:
+    branches: 
+      - main
+    types: [ opened ]
+
+# Permissions needed for reacting and adding comments for IssueOps commands
+permissions:
+  pull-requests: write
+  deployments: write
+  contents: write
+  checks: read
+
+jobs:
+  status-check-temp:
+      runs-on: ubuntu-latest
+      steps:
+      - name: status-check-temp
+        run: |
+          echo "status check temp"
+
