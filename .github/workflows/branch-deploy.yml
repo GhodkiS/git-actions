@@ -134,7 +134,6 @@ jobs:
         create_branch: true
 
     - name: Report tests check
-      if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
       uses: actions/github-script@v3
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -149,7 +148,6 @@ jobs:
           })
 
     - name: Merge
-      if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
       uses: devmasx/merge-branch@master
       with:
         type: now
@@ -159,7 +157,6 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
     
     - name: cleanup temp branch
-      if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
       run: ./.github/scripts/branch-deploy.sh -a "cleanup"
       env:
         T_ENV_APP: ${{steps.branch-deploy.outputs.environment}}
