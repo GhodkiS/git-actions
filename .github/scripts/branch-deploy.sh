@@ -104,12 +104,6 @@ if [[ -n "$tail_s" ]]; then
 else
     echo -e "$multiline_text" >> "${file}"
 fi
-
-# if [[ -n $(git status --porcelain) ]]; then
-# git add "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
-# git commit -am "update target revision of $t_env_app to $T_BRANCH [skip ci]"
-# git push
-# fi
 }
 
 cleanup() {
@@ -141,14 +135,10 @@ unlock-action() {
 t_app=$(echo "$T_ENV_APP" | awk -F '_' '{print $1}')
 t_env=$(echo "$T_ENV_APP" | awk -F '_' '{print $2}')
 file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
+git switch -c "$T_ENV_APP-merge-temp"
 sed -i '/# lock target environment starts/,/# lock target environment ends/d' "${file}"
 git config --global user.name 'test-user'
 git config --global user.email 'test-user@test.com'
-if [[ -n $(git status --porcelain) ]]; then
-git add "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
-git commit -am "unlock $T_ENV_APP [skip ci]"
-git push
-fi
 }
 
 search-locks() {
