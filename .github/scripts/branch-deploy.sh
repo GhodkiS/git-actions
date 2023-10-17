@@ -80,7 +80,7 @@ t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
 file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
 sed -i '/# lock target environment starts/,/# lock target environment ends/d' "{$file}"
 git config --global user.name 'test-user'
-git config --global user.email 'saurabh.ghodki91@gmail.com'
+git config --global user.email 'test-user@test.com'
 if [[ -n $(git status --porcelain) ]]; then
 git add "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
 git commit -am "unlock $t_env_app [skip ci]"
@@ -98,21 +98,21 @@ lock_env=$(jq -r ".environment" "$json_file" 2> /dev/null)
 if [[ "$lock_branch" == "$T_BRANCH" ]]
 then
 git_active_lock_flag=true
-git_active_lock="${git_active_lock} ${lock_env}"
+git_active_lock="${git_active_lock},${lock_env}"
 fi
 done
 if [[ "${git_active_lock_flag}" = true ]]
 then
-echo "found active locks: ${git_active_lock}"
-echo "GITHUB_ACTIVE_LOCKS=${git_active_lock}" >> "${GITHUB_OUTPUT}"
+echo "found active locks: ${git_active_lock/,/}"
+echo "GITHUB_ACTIVE_LOCKS=${git_active_lock/,/}" >> "${GITHUB_OUTPUT}"
 fi
 git checkout main
 
 
 elif [[ "$1" == "unlock-pr-close" ]]; then
 git config --global user.name 'test-user'
-git config --global user.email 'saurabh.ghodki91@gmail.com'
-for t_branches in ${ACTIVE_LOCKS}
+git config --global user.email 'test-user@test.com'
+for t_branches in ${ACTIVE_LOCKS//,/ }
 do
 git push origin --delete "${t_branches}-branch-deploy-lock"
 done
@@ -120,8 +120,8 @@ done
 
 elif [[ "$1" == "commit-unlock-main" ]]; then
 git config --global user.name 'test-user'
-git config --global user.email 'saurabh.ghodki91@gmail.com'
-for t_env_app in ${ACTIVE_LOCKS}
+git config --global user.email 'test-user@test.com'
+for t_env_app in ${ACTIVE_LOCKS//,/ }
 do
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
