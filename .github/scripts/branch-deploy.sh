@@ -79,11 +79,11 @@ echo "GITHUB_TARGET_ENV=$t_env_app" >> "${GITHUB_OUTPUT}"
 
 
 update-target-revision() {
-t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
-t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
+t_app=$(echo "$T_ENV_APP" | awk -F '_' '{print $1}')
+t_env=$(echo "$T_ENV_APP" | awk -F '_' '{print $2}')
 git config --global user.name 'test-user'
 git config --global user.email 'test-user@test.com'
-git switch -c "$t_env_app-merge-temp"
+git switch -c "$T_ENV_APP-merge-temp"
 file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
 sed -i '/# lock target environment starts/,/# lock target environment ends/d' "$file"
 multiline_text=$(cat <<EOF
@@ -112,6 +112,12 @@ fi
 # fi
 }
 
+cleanup() {
+git config --global user.name 'test-user'
+git config --global user.email 'test-user@test.com'
+git push origin --delete "${T_ENV_APP}-merge-temp"
+}
+
 update-lock-json() {
 json_file="lock.json"
 key_to_update1="branch"
@@ -132,15 +138,15 @@ git push
 }
 
 unlock-action() {
-t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
-t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
+t_app=$(echo "$T_ENV_APP" | awk -F '_' '{print $1}')
+t_env=$(echo "$T_ENV_APP" | awk -F '_' '{print $2}')
 file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
 sed -i '/# lock target environment starts/,/# lock target environment ends/d' "{$file}"
 git config --global user.name 'test-user'
 git config --global user.email 'test-user@test.com'
 if [[ -n $(git status --porcelain) ]]; then
 git add "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
-git commit -am "unlock $t_env_app [skip ci]"
+git commit -am "unlock $T_ENV_APP [skip ci]"
 git push
 fi
 }
@@ -214,6 +220,9 @@ case $ACTION in
    ;;
  commit-unlock-main)
    commit-unlock-main
+   ;;
+ cleanup)
+   cleanup
    ;;
  *)
    exit_with_error

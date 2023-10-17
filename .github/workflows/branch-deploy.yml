@@ -43,7 +43,7 @@ jobs:
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
         run: ./.github/scripts/branch-deploy.sh -a "update-target-revision"
         env:
-          t_env_app: ${{steps.branch-deploy.outputs.environment}}
+          T_ENV_APP: ${{steps.branch-deploy.outputs.environment}}
           T_BRANCH: ${{steps.branch-deploy.outputs.ref}}
 
       - uses: stefanzweifel/git-auto-commit-action@v5
@@ -77,6 +77,12 @@ jobs:
           target_branch: main
           message: '[skip ci] merge'
           github_token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: cleanup temp branch
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
+        run: ./.github/scripts/branch-deploy.sh -a "cleanup"
+        env:
+          T_ENV_APP: ${{steps.branch-deploy.outputs.environment}}
 
 
       - uses: actions/checkout@v3
@@ -119,7 +125,7 @@ jobs:
     - name: unlock-action
       run: ./.github/scripts/branch-deploy.sh -a "unlock-action"
       env:
-        t_env_app: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
+        T_ENV_APP: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
 
 
   lock-info:
