@@ -1,6 +1,6 @@
 name: branch-deploy-release-lock
 
-on:
+'on':
   pull_request:
     branches: 
       - main
