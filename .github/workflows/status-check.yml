@@ -4,7 +4,7 @@ name: branch-deploy-release-lock
   pull_request:
     branches: 
       - main
-    types: [ opened, edited, reopened ]
+    types: [ opened, reopened, synchronize ]
 
 # Permissions needed for reacting and adding comments for IssueOps commands
 permissions:
