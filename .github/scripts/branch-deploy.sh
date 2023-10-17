@@ -102,7 +102,7 @@ tail_s=$(tail -c 1 "${file}")
 if [[ -n "$tail_s" ]]; then
     echo -e "\n$multiline_text" >> "${file}"
 else
-    echo -e "$multiline_text" >> "{$file}"
+    echo -e "$multiline_text" >> "${file}"
 fi
 
 # if [[ -n $(git status --porcelain) ]]; then
