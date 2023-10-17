@@ -126,8 +126,8 @@ jobs:
       run: ./.github/scripts/branch-deploy.sh -a "unlock-action"
       env:
         T_ENV_APP: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
+
     - uses: stefanzweifel/git-auto-commit-action@v5
-      if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
       id: commit
       with:
         branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
