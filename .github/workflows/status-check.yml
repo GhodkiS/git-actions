@@ -19,5 +19,8 @@ jobs:
       steps:
       - name: status-check-temp
         run: |
-          echo "status check temp"
+          if [[ -f "./pr-fail" ]]; then
+          exit 1
+          fi
+
 
