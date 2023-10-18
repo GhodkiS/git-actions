@@ -1,3 +1,0 @@
-apiVersion: kustomize
-metadata:
-  name: app1
