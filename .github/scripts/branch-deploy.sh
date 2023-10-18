@@ -180,11 +180,9 @@ do
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
 file="./$t_env/applications/$t_app/kustomization.yaml"
+git switch -c "$T_ENV_APP-merge-temp"
 sed -i '/# lock target environment starts/,/# lock target environment ends/d' "${file}"
-git add "./$t_env/applications/$t_app/kustomization.yaml"
 done
-git commit -am "unlock $t_env_app [skip ci]"
-git push
 }
 #===============================================================================================
 # MAIN

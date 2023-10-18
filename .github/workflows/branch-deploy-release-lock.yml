@@ -48,3 +48,41 @@ jobs:
         run: ./.github/scripts/branch-deploy.sh -a "commit-unlock-main"
         env:
           ACTIVE_LOCKS: ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}
+      
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        id: commit
+        with:
+          branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
+          create_branch: true
+
+      - name: Report tests check
+        if: steps.commit.outputs.commit_hash != ''
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.checks.create({
+              name: 'status-check-temp',
+              head_sha: '${{ steps.commit.outputs.commit_hash }}',
+              status: 'completed',
+              conclusion: 'success',
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            })
+
+      - name: Merge
+        if: steps.commit.outputs.commit_hash != ''
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
+          target_branch: main
+          message: '[skip ci] merge'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: cleanup temp branch
+        if: steps.commit.outputs.commit_hash != ''
+        run: ./.github/scripts/branch-deploy.sh -a "cleanup"
+        env:
+          T_ENV_APP: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
+
