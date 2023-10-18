@@ -222,7 +222,7 @@ jobs:
       if: ${{ steps.filter.outputs.markdown == 'true' }}
       run: |
         for file in ${{ steps.filter.outputs.markdown_files }}; do
-          if [[ ! $file == "dev/**" ]]
+          if [[ ! $file == "dev/*" ]]
           then
           echo "unapproved files are commited"
           exit 1
