@@ -203,7 +203,7 @@ jobs:
       - name: checkout to main
         uses: actions/checkout@v3
         with:
-          ref: ${{github.event.pull_request.head.ref}}
+          ref: ${{github.event.issue.pull_request.head.ref}}
           fetch-depth: 0
 
       - name: Get changed files
@@ -212,7 +212,7 @@ jobs:
 
       - name: List all changed files
         run: |
-          echo "target branch: ${{github.event.pull_request.head.ref}}"
+          echo "target branch: ${{github.event.issue.pull_request.head.ref}}"
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             if [[ $file == *match-content* ]]
             then
