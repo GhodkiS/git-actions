@@ -76,7 +76,7 @@ jobs:
           type: now
           from_branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
           target_branch: main
-          message: '[skip ci] merge'
+          message: "[skip ci] deploy ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}"
           github_token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: cleanup temp branch
@@ -157,7 +157,7 @@ jobs:
         type: now
         from_branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
         target_branch: main
-        message: '[skip ci] merge'
+        message: "[skip ci] unlock ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}"
         github_token: ${{ secrets.GITHUB_TOKEN }}
     
     - name: cleanup temp branch
