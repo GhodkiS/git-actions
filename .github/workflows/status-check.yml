@@ -17,6 +17,11 @@ jobs:
   status-check-temp:
       runs-on: ubuntu-latest
       steps:
+      - name: checkout to main
+        uses: actions/checkout@v3
+        with:
+          ref: main
+
       - name: status-check-temp
         run: |
           if [[ -f "./pr-fail" ]]; then
