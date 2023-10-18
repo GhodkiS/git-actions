@@ -218,10 +218,12 @@ jobs:
         filters: |
             markdown:
               - added|modified: 'dev/**'
+            all:
+              - added|modified: '*'
     - name: Check changed files
       if: ${{ steps.filter.outputs.markdown == 'true' }}
       run: |
-        for file in ${{ steps.filter.outputs.markdown_files }}; do
+        for file in ${{ steps.filter.outputs.all-files_files }}; do
           if [[ ! $file == "dev/"* ]]
           then
           echo "unapproved files are commited"
