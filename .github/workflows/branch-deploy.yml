@@ -214,6 +214,7 @@ jobs:
       with:
         base: main
         ref: ${{ steps.get_branch.outputs.branch }} # your feature branch
+        list-files: shell
         filters: |
             markdown:
               - added|modified: '*dev/*'
