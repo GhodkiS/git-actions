@@ -217,7 +217,7 @@ jobs:
         list-files: shell
         filters: |
             markdown:
-              - added|modified: '*dev/*'
+              - added|modified: 'dev/**'
     - name: Lint Markdown
       if: ${{ steps.filter.outputs.markdown == 'true' }}
       run: echo ${{ steps.filter.outputs.markdown_files }}
