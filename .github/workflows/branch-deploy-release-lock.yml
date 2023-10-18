@@ -11,7 +11,7 @@ permissions:
   pull-requests: write
   deployments: write
   contents: write
-  checks: read
+  checks: write
 
 jobs:
   branch-deploy-release-lock:
