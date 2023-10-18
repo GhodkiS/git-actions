@@ -226,3 +226,4 @@ jobs:
       with:
         review-message: "Auto approved grafana dashboard change PR"
         pull-request-number: ${{ github.event.issue.number }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
