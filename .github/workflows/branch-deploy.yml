@@ -200,10 +200,9 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '.auto-review') }}
     steps:
-      - name: checkout to main
+      - name: checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{github.event.issue.pull_request.head.ref}}
           fetch-depth: 0
 
       - name: Get changed files
