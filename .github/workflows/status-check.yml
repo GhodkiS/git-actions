@@ -20,7 +20,7 @@ jobs:
       - name: checkout to main
         uses: actions/checkout@v3
         with:
-          ref: main
+          ref: ${{ github.head_ref }}
 
       - name: status-check-temp
         run: |
