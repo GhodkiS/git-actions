@@ -221,7 +221,7 @@ jobs:
               - '!dev/**'
 
     - name: Auto approve for dashboard
-      if: ${{ steps.fiter.outputs.all-dev == 'true' && steps.fiter.outputs.not-all-dev  == 'false' }}
+      if: ${{ steps.filter.outputs.all-dev == 'true' && steps.filter.outputs.not-all-dev  == 'false' }}
       uses: hmarr/auto-approve-action@44888193675f29a83e04faf4002fa8c0b537b1e4
       with:
         review-message: "Auto approved grafana dashboard change PR"
