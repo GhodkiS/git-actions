@@ -220,14 +220,9 @@ jobs:
               - added|modified: 'dev/**'
             all:
               - added|modified: '!dev/**'
-    - name: Check changed files
-      if: ${{ steps.filter.outputs.markdown == 'true' }}
-      run: |
-        for file in ${{ steps.filter.outputs.all_files }}; do
-          if [[ ! $file == "dev/"* ]]
-          then
-          echo "unapproved files are commited"
-          exit 1
-          break
-          fi      
-        done
+
+    - name: Auto approve for dashboard
+      if: ${{ steps.fiter.outputs.markdown == 'true' && steps.fiter.outputs.all  == 'false' }}
+      uses: hmarr/auto-approve-action@44888193675f29a83e04faf4002fa8c0b537b1e4
+      with:
+        review-message: "Auto approved grafana dashboard change PR"
