@@ -48,11 +48,12 @@ jobs:
         run: ./.github/scripts/branch-deploy.sh -a "commit-unlock-main"
         env:
           ACTIVE_LOCKS: ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}
+          ACTIVE_FIRST_LOCK: ${{steps.search-locks.outputs.GITHUB_ACTIVE_FIRST_LOCK}}
       
       - uses: stefanzweifel/git-auto-commit-action@v5
         id: commit
         with:
-          branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
+          branch: "${{steps.search-locks.outputs.GITHUB_ACTIVE_FIRST_LOCK}}-merge-temp"
           create_branch: true
 
       - name: Report tests check
@@ -75,7 +76,7 @@ jobs:
         uses: devmasx/merge-branch@master
         with:
           type: now
-          from_branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
+          from_branch: "${{steps.search-locks.outputs.GITHUB_ACTIVE_FIRST_LOCK}}-merge-temp"
           target_branch: main
           message: '[skip ci] merge'
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -84,5 +85,5 @@ jobs:
         if: steps.commit.outputs.commit_hash != ''
         run: ./.github/scripts/branch-deploy.sh -a "cleanup"
         env:
-          T_ENV_APP: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
+          T_ENV_APP: ${{steps.search-locks.outputs.GITHUB_ACTIVE_FIRST_LOCK}}
 

@@ -156,8 +156,10 @@ fi
 done
 if [[ "${git_active_lock_flag}" = true ]]
 then
+git_active_first_lock=$(echo "${git_active_lock/,/}" | cut -d',' -f1)
 echo "found active locks: ${git_active_lock/,/}"
 echo "GITHUB_ACTIVE_LOCKS=${git_active_lock/,/}" >> "${GITHUB_OUTPUT}"
+echo "GITHUB_ACTIVE_FIRST_LOCK=${git_active_first_lock/,/}" >> "${GITHUB_OUTPUT}"
 fi
 git checkout main
 }
@@ -175,12 +177,12 @@ done
 commit-unlock-main() {
 git config --global user.name 'test-user'
 git config --global user.email 'test-user@test.com'
+git switch -c "$ACTIVE_FIRST_LOCK-merge-temp"
 for t_env_app in ${ACTIVE_LOCKS//,/ }
 do
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
 file="./$t_env/applications/$t_app/kustomization.yaml"
-git switch -c "$t_env_app-merge-temp"
 sed -i '/# lock target environment starts/,/# lock target environment ends/d' "${file}"
 done
 }
