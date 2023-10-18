@@ -69,7 +69,7 @@ echo "comment body: $COMMENT_BODY"
 fi
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
-if [ ! -f "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml" ]
+if [ ! -f "./$t_env/applications/$t_app/kustomization.yaml" ]
 then
 echo "no $t_env_app target  environment found"
 exit 1
@@ -84,7 +84,7 @@ t_env=$(echo "$T_ENV_APP" | awk -F '_' '{print $2}')
 git config --global user.name 'test-user'
 git config --global user.email 'test-user@test.com'
 git switch -c "$T_ENV_APP-merge-temp"
-file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
+file="./$t_env/applications/$t_app/kustomization.yaml"
 sed -i '/# lock target environment starts/,/# lock target environment ends/d' "$file"
 multiline_text=$(cat <<EOF
 # lock target environment starts
@@ -134,7 +134,7 @@ git push
 unlock-action() {
 t_app=$(echo "$T_ENV_APP" | awk -F '_' '{print $1}')
 t_env=$(echo "$T_ENV_APP" | awk -F '_' '{print $2}')
-file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
+file="./$t_env/applications/$t_app/kustomization.yaml"
 git switch -c "$T_ENV_APP-merge-temp"
 sed -i '/# lock target environment starts/,/# lock target environment ends/d' "${file}"
 git config --global user.name 'test-user'
@@ -179,9 +179,9 @@ for t_env_app in ${ACTIVE_LOCKS//,/ }
 do
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
 t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
-file="./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
+file="./$t_env/applications/$t_app/kustomization.yaml"
 sed -i '/# lock target environment starts/,/# lock target environment ends/d' "${file}"
-git add "./argocd/overlays/$t_env/applications/$t_app/kustomization.yaml"
+git add "./$t_env/applications/$t_app/kustomization.yaml"
 done
 git commit -am "unlock $t_env_app [skip ci]"
 git push
