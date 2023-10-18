@@ -225,3 +225,4 @@ jobs:
       uses: hmarr/auto-approve-action@44888193675f29a83e04faf4002fa8c0b537b1e4
       with:
         review-message: "Auto approved grafana dashboard change PR"
+        pull-request-number: ${{ github.event.issue.number }}
