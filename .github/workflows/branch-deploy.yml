@@ -194,3 +194,40 @@ jobs:
           environment_targets: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
           trigger: '.deploy'
           sticky_locks: "true"
+
+  auto-review:
+    name: auto-review
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.comment.body, '.auto-review') }}
+    steps:
+      - name: checkout to main
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v39
+
+      - name: List all changed files
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            if [[ $file == *match-content* ]]
+            then
+            match-content=true
+            break
+            fi
+            if [[ $match-content = true ]]
+            then
+            if [[ ! $file == *match-content* ]]
+            then
+            not-match-content=true
+            fi
+            fi         
+          done
+          if [[ "$match-content" = false || "$not-match-content" = true ]]
+          then
+          exit 1
+          fi
+
