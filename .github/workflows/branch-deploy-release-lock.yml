@@ -56,6 +56,7 @@ jobs:
         with:
           branch: "${{steps.search-locks.outputs.GITHUB_ACTIVE_FIRST_LOCK}}-merge-temp"
           create_branch: true
+          commit_message: "[skip ci] branch-deploy unlock ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}"
 
       - name: Report tests check
         if: steps.commit.outputs.commit_hash != ''
@@ -79,7 +80,7 @@ jobs:
           type: now
           from_branch: "${{steps.search-locks.outputs.GITHUB_ACTIVE_FIRST_LOCK}}-merge-temp"
           target_branch: main
-          message: '[skip ci] merge'
+          message: '[skip ci] unlock during PR merge/close'
           github_token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: cleanup temp branch
