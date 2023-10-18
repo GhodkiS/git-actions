@@ -205,31 +205,42 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v39
+      - uses: dorny/paths-filter@v2
+        id: filter
         with:
-          ref: branch1
+          list-files: shell
+          filters: |
+            markdown:
+              - added|modified: '*dev*'
+      - name: Lint Markdown
+        if: ${{ steps.filter.outputs.markdown == 'true' }}
+        run: npx textlint ${{ steps.filter.outputs.markdown_files }}
 
-      - name: List all changed files
-        run: |
-          echo "target branch: ${{github.event.issue.pull_request.head.ref}}"
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            if [[ $file == *match-content* ]]
-            then
-            match-content=true
-            break
-            fi
-            if [[ $match-content = true ]]
-            then
-            if [[ ! $file == *match-content* ]]
-            then
-            not-match-content=true
-            fi
-            fi         
-          done
-          if [[ "$match-content" = false || "$not-match-content" = true ]]
-          then
-          exit 1
-          fi
+      # - name: Get changed files
+      #   id: changed-files
+      #   uses: tj-actions/changed-files@v39
+      #   with:
+      #     ref: branch1
+
+      # - name: List all changed files
+      #   run: |
+      #     echo "target branch: ${{github.event.issue.pull_request.head.ref}}"
+      #     for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+      #       if [[ $file == *match-content* ]]
+      #       then
+      #       match-content=true
+      #       break
+      #       fi
+      #       if [[ $match-content = true ]]
+      #       then
+      #       if [[ ! $file == *match-content* ]]
+      #       then
+      #       not-match-content=true
+      #       fi
+      #       fi         
+      #     done
+      #     if [[ "$match-content" = false || "$not-match-content" = true ]]
+      #     then
+      #     exit 1
+      #     fi
 
