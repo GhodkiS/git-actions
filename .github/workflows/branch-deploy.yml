@@ -46,14 +46,15 @@ jobs:
           T_ENV_APP: ${{steps.branch-deploy.outputs.environment}}
           T_BRANCH: ${{steps.branch-deploy.outputs.ref}}
 
-      - uses: stefanzweifel/git-auto-commit-action@v5
+      - name: temp branch commit
+        uses: stefanzweifel/git-auto-commit-action@v5
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
         id: commit
         with:
           branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
           create_branch: true
 
-      - name: Report tests check
+      - name: Report status check
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
         uses: actions/github-script@v3
         with:
@@ -68,7 +69,7 @@ jobs:
               repo: context.repo.repo
             })
 
-      - name: Merge
+      - name: temp branch merge
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
         uses: devmasx/merge-branch@master
         with:
@@ -84,8 +85,8 @@ jobs:
         env:
           T_ENV_APP: ${{steps.branch-deploy.outputs.environment}}
 
-
-      - uses: actions/checkout@v3
+      - name: checkout to lock branch
+        uses: actions/checkout@v3
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
         with:
           ref: ${{steps.branch-deploy.outputs.environment}}-branch-deploy-lock
@@ -127,7 +128,8 @@ jobs:
       env:
         T_ENV_APP: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
 
-    - uses: stefanzweifel/git-auto-commit-action@v5
+    - name: temp branch commit
+      uses: stefanzweifel/git-auto-commit-action@v5
       id: commit
       with:
         branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
@@ -148,7 +150,7 @@ jobs:
             repo: context.repo.repo
           })
 
-    - name: Merge
+    - name: temp branch merge
       if: steps.commit.outputs.commit_hash != ''
       uses: devmasx/merge-branch@master
       with:
