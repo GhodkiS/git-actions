@@ -218,28 +218,14 @@ jobs:
         filters: |
             markdown:
               - added|modified: 'dev/**'
-    - name: Lint Markdown
+    - name: Check changed files
       if: ${{ steps.filter.outputs.markdown == 'true' }}
-      run: echo ${{ steps.filter.outputs.markdown_files }}
-
-  #     - name: List all changed files
-  #       run: |
-  #         echo "target branch: ${{github.event.issue.pull_request.head.ref}}"
-  #         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-  #           if [[ $file == *match-content* ]]
-  #           then
-  #           match-content=true
-  #           break
-  #           fi
-  #           if [[ $match-content = true ]]
-  #           then
-  #           if [[ ! $file == *match-content* ]]
-  #           then
-  #           not-match-content=true
-  #           fi
-  #           fi         
-  #         done
-  #         if [[ "$match-content" = false || "$not-match-content" = true ]]
-  #         then
-  #         exit 1
-  #         fi
+      run: |
+        for file in ${{ steps.filter.outputs.markdown_files }}; do
+          if [[ ! $file == "dev/**" ]]
+          then
+          echo "unapproved files are commited"
+          exit 1
+          break
+          fi      
+        done
