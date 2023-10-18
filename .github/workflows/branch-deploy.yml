@@ -195,32 +195,31 @@ jobs:
           trigger: '.deploy'
           sticky_locks: "true"
 
-  # auto-review:
-  #   name: auto-review
-  #   runs-on: ubuntu-latest
-  #   if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '.auto-review') }}
-  #   steps:
-  #     - name: checkout
-  #       uses: actions/checkout@v3
-  #       with:
-  #         fetch-depth: 0
+  auto-review:
+    name: auto-review
+    runs-on: ubuntu-latest
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '.auto-review') }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: Get branch
+      id: 'get_branch'
+      env:
+        REPO: ${{ github.repository }}
+        PR_NO: ${{ github.event.issue.number }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: echo "branch=$(gh pr view $PR_NO --repo $REPO --json headRefName --jq '.headRefName')" >> "$GITHUB_OUTPUT"
 
-  #     - uses: dorny/paths-filter@v2
-  #       id: filter
-  #       with:
-  #         list-files: shell
-  #         filters: |
-  #           markdown:
-  #             - added|modified: '*dev*'
-  #     - name: Lint Markdown
-  #       if: ${{ steps.filter.outputs.markdown == 'true' }}
-  #       run: npx textlint ${{ steps.filter.outputs.markdown_files }}
-
-  #     - name: Get changed files
-  #       id: changed-files
-  #       uses: tj-actions/changed-files@v39
-  #       with:
-  #         ref: branch1
+    - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50
+      id: filter
+      with:
+        base: main
+        ref: ${{ steps.get_branch.outputs.branch }} # your feature branch
+        filters: |
+            markdown:
+              - added|modified: '*/dev*'
+    - name: Lint Markdown
+      if: ${{ steps.filter.outputs.markdown == 'true' }}
+      run: echo ${{ steps.filter.outputs.markdown_files }}
 
   #     - name: List all changed files
   #       run: |
@@ -243,4 +242,3 @@ jobs:
   #         then
   #         exit 1
   #         fi
-
