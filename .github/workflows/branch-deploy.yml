@@ -174,7 +174,7 @@ jobs:
   lock-info:
     name: lock-info
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.comment.body, '.lock') && contains(github.event.comment.body, '--info') }}
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '.lock') && contains(github.event.comment.body, '--info') }}
     steps:
       - name: checkout to main
         uses: actions/checkout@v3
@@ -198,7 +198,7 @@ jobs:
   auto-review:
     name: auto-review
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.comment.body, '.auto-review') }}
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '.auto-review') }}
     steps:
       - name: checkout to main
         uses: actions/checkout@v3
@@ -212,6 +212,7 @@ jobs:
 
       - name: List all changed files
         run: |
+          echo "target branch: ${{ github.head_ref }}"
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             if [[ $file == *match-content* ]]
             then
