@@ -281,7 +281,7 @@ jobs:
           github.rest.reactions.createForIssueComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            comment_id: "${{github.event.comment.comment_id}}",
+            comment_id: "${{github.event.comment.id}}",
             content: '+1',
           })
 
