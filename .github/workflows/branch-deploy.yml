@@ -76,7 +76,7 @@ jobs:
       - name: temp branch merge
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
         run: |
-          git config --global user.email saurabh.ghodki91@gmail.com"
+          git config --global user.email "saurabh.ghodki91@gmail.com"
           git config --global user.name "saurabh ghodki"
           git checkout main
           git pull
