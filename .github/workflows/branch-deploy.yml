@@ -66,6 +66,7 @@ jobs:
           git pull
           git merge --squash "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
           git commit -m "[skip ci] deploy ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}"
+          git log -5
           last_commit=$(git log --format="%H" -n 1)
           echo "GITHUB_LAST_COMMIT=$last_commit" >> "${GITHUB_OUTPUT}"
 
