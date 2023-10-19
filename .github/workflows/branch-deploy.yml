@@ -71,24 +71,24 @@ jobs:
           echo "GITHUB_LAST_COMMIT=$last_commit" >> "${GITHUB_OUTPUT}"
 
 
-      - name: Report status check
-        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
-        uses: actions/github-script@v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const pr_checks = "${{ vars.GIT_STATUS_CHECKS }}".split(",")
-            for (pr_check of pr_checks) {
-            console.log(pr_check);
-            github.checks.create({
-              name: pr_check,
-              head_sha: '${{ steps.temp-merge-1.outputs.GITHUB_LAST_COMMIT }}',
-              status: 'completed',
-              conclusion: 'success',
-              owner: context.repo.owner,
-              repo: context.repo.repo
-            })
-            }
+      # - name: Report status check
+      #   if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
+      #   uses: actions/github-script@v3
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     script: |
+      #       const pr_checks = "${{ vars.GIT_STATUS_CHECKS }}".split(",")
+      #       for (pr_check of pr_checks) {
+      #       console.log(pr_check);
+      #       github.checks.create({
+      #         name: pr_check,
+      #         head_sha: '${{ steps.temp-merge-1.outputs.GITHUB_LAST_COMMIT }}',
+      #         status: 'completed',
+      #         conclusion: 'success',
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo
+      #       })
+      #       }
 
       - name: temp branch merge-2
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
