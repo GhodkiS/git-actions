@@ -278,10 +278,10 @@ jobs:
             repo: context.repo.repo,
             body: '👋 Commit contains files not related to grafana config. Auto-approve rejected.'
           })
-          octokit.rest.reactions.createForIssueComment({
+          github.rest.reactions.createForIssueComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            comment_id: "${{github.event.comment.comment_id",
+            comment_id: "${{github.event.comment.comment_id}}",
             content: '+1',
           })
 
