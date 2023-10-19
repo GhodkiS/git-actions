@@ -268,11 +268,10 @@ jobs:
 
   
     - name: PR comment on auto-approve rejection
-      # if: steps.filter.outputs.not-all-dev  == 'true'
       uses: actions/github-script@v6
       with:
         script: |
-          if ("${{steps.filter.outputs.not-all-dev}}" == "true") 
+          if ("${{steps.filter.outputs.not-all-dev}}" == "false") 
           {
            reaction = '+1'
           }
