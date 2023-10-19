@@ -78,7 +78,7 @@ jobs:
         run: |
           git checkout main
           git pull
-          git merge "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp" --squash
+          git merge "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
           git push
 
         # uses: devmasx/merge-branch@master
