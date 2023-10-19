@@ -272,16 +272,18 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: '👋 Commit contains files not related to grafana config. Auto-approve rejected.'
-          })
+          if ("${{steps.filter.outputs.not-all-dev}}" == "true") 
+          {
+           reaction = '+1'
+          }
+          else
+          {
+            reaction = '-1'
+          }
           github.rest.reactions.createForIssueComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
             comment_id: "${{github.event.comment.id}}",
-            content: '+1',
+            content: reaction,
           })
 
