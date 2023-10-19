@@ -81,7 +81,6 @@ echo "GITHUB_TARGET_ENV=$t_env_app" >> "${GITHUB_OUTPUT}"
 update-target-revision() {
 t_app=$(echo "$T_ENV_APP" | awk -F '_' '{print $1}')
 t_env=$(echo "$T_ENV_APP" | awk -F '_' '{print $2}')
-git switch -c "$T_ENV_APP-merge-temp"
 file="./$t_env/applications/$t_app/kustomization.yaml"
 sed -i '/# lock target environment starts/,/# lock target environment ends/d' "$file"
 multiline_text=$(cat <<EOF
@@ -129,7 +128,6 @@ unlock-action() {
 t_app=$(echo "$T_ENV_APP" | awk -F '_' '{print $1}')
 t_env=$(echo "$T_ENV_APP" | awk -F '_' '{print $2}')
 file="./$t_env/applications/$t_app/kustomization.yaml"
-git switch -c "$T_ENV_APP-merge-temp"
 sed -i '/# lock target environment starts/,/# lock target environment ends/d' "${file}"
 }
 
@@ -165,7 +163,6 @@ done
 
 
 commit-unlock-main() {
-git switch -c "$ACTIVE_FIRST_LOCK-merge-temp"
 for t_env_app in ${ACTIVE_LOCKS//,/ }
 do
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
