@@ -27,5 +27,11 @@ jobs:
           if [[ -f "./pr-fail" ]]; then
           exit 1
           fi
+      
+      - name: status-check-temp2
+        run: |
+          if [[ -f "./pr-fail" ]]; then
+          exit 1
+          fi
 
 
