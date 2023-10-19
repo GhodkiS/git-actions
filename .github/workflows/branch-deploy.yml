@@ -76,8 +76,8 @@ jobs:
       - name: temp branch merge
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
         run: |
-          git checkout "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
-          git pull origin main
+          git checkout main
+          git pull
           git merge "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp" --squash
           git push
 
