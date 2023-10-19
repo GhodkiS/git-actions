@@ -252,7 +252,6 @@ jobs:
       if: ${{ steps.filter.outputs.all-dev == 'true' && steps.filter.outputs.not-all-dev  == 'false' }}
       uses: hmarr/auto-approve-action@44888193675f29a83e04faf4002fa8c0b537b1e4
       with:
-        review-message: "Auto approved grafana dashboard change PR"
         pull-request-number: ${{ github.event.issue.number }}
 
     # - name: PR comment on auto-approve rejection
