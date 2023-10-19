@@ -4,17 +4,15 @@ name: branch-deploy
   issue_comment:
     types: [created]
 
-# Permissions needed for reacting and adding comments for IssueOps commands
-permissions:
-  pull-requests: write
-  deployments: write
-  contents: write
-  checks: write
-
 jobs:
   deploy:
     name: deploy
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      deployments: write
+      contents: write
+      checks: write
     if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '.deploy')}}
 
     steps:
@@ -108,6 +106,11 @@ jobs:
   unlock:
     name: unlock
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      deployments: write
+      contents: write
+      checks: write
     if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '.unlock') }}
     steps:
     - name: checkout to main
@@ -184,6 +187,11 @@ jobs:
   lock-info:
     name: lock-info
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      deployments: write
+      contents: none
+      checks: none
     if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '.lock') && contains(github.event.comment.body, '--info') }}
     steps:
       - name: checkout to main
@@ -208,6 +216,11 @@ jobs:
   auto-review:
     name: auto-review
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      deployments: write
+      contents: read
+      checks: none
     if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '.auto-review') }}
     steps:
     - uses: actions/checkout@v3

@@ -6,16 +6,14 @@ name: branch-deploy-release-lock
       - main
     types: [ closed ]
 
-# Permissions needed for reacting and adding comments for IssueOps commands
-permissions:
-  pull-requests: write
-  deployments: write
-  contents: write
-  checks: write
-
 jobs:
   branch-deploy-release-lock:
       runs-on: ubuntu-latest
+      permissions:
+        pull-requests: write
+        deployments: write
+        contents: write
+        checks: write
       steps:
       - name: checkout-main
         uses: actions/checkout@v3
