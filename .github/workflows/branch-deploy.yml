@@ -255,8 +255,21 @@ jobs:
         review-message: "Auto approved grafana dashboard change PR"
         pull-request-number: ${{ github.event.issue.number }}
 
+    # - name: PR comment on auto-approve rejection
+    #   if: steps.filter.outputs.not-all-dev  == 'true'
+    #   uses: actions/github-script@v6
+    #   with:
+    #     script: |
+    #       github.rest.issues.createComment({
+    #         issue_number: context.issue.number,
+    #         owner: context.repo.owner,
+    #         repo: context.repo.repo,
+    #         body: '👋 Commit contains files not related to grafana config. Auto-approve rejected.'
+    #       })
+
+  
     - name: PR comment on auto-approve rejection
-      if: steps.filter.outputs.not-all-dev  == 'true'
+      # if: steps.filter.outputs.not-all-dev  == 'true'
       uses: actions/github-script@v6
       with:
         script: |
@@ -266,3 +279,10 @@ jobs:
             repo: context.repo.repo,
             body: '👋 Commit contains files not related to grafana config. Auto-approve rejected.'
           })
+          octokit.rest.reactions.createForIssueComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            comment_id: "${{github.event.comment.comment_id",
+            content: '+1',
+          })
+
