@@ -54,6 +54,7 @@ jobs:
           branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
           create_branch: true
           commit_message: "[skip ci] branch-deploy lock/deploy ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}"
+          file_pattern: '*/applications/*/kustomization.yaml'
 
       - name: Report status check
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
@@ -140,6 +141,7 @@ jobs:
         branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
         create_branch: true
         commit_message: "[skip ci] branch-deploy unlock ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}"
+        file_pattern: '*/applications/*/kustomization.yaml'
 
     - name: Report tests check
       if: steps.commit.outputs.commit_hash != ''

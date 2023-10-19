@@ -57,6 +57,7 @@ jobs:
           branch: "${{steps.search-locks.outputs.GITHUB_ACTIVE_FIRST_LOCK}}-merge-temp"
           create_branch: true
           commit_message: "[skip ci] branch-deploy unlock ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}"
+          file_pattern: '*/applications/*/kustomization.yaml'
 
       - name: Report tests check
         if: steps.commit.outputs.commit_hash != ''
