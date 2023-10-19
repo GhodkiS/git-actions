@@ -1,4 +1,4 @@
-name: branch-deploy-release-lock
+name: status check
 
 'on':
   pull_request:
@@ -27,11 +27,17 @@ jobs:
           if [[ -f "./pr-fail" ]]; then
           exit 1
           fi
-      
-      - name: status-check-temp2
-        run: |
-          if [[ -f "./pr-fail" ]]; then
-          exit 1
-          fi
 
+  status-check-temp2:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout to main
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}
 
+    - name: status-check-temp
+      run: |
+        if [[ -f "./pr-fail" ]]; then
+        exit 1
+        fi
