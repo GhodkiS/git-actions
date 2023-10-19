@@ -75,13 +75,19 @@ jobs:
 
       - name: temp branch merge
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
-        uses: devmasx/merge-branch@master
-        with:
-          type: now
-          from_branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
-          target_branch: main
-          message: "[skip ci] deploy ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git checkout "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
+          git pull origin main
+          git merge "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp" --squash
+          git push
+
+        # uses: devmasx/merge-branch@master
+        # with:
+        #   type: now
+        #   from_branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
+        #   target_branch: main
+        #   message: "[skip ci] deploy ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}"
+        #   github_token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: cleanup temp branch
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
@@ -254,19 +260,6 @@ jobs:
       with:
         pull-request-number: ${{ github.event.issue.number }}
 
-    # - name: PR comment on auto-approve rejection
-    #   if: steps.filter.outputs.not-all-dev  == 'true'
-    #   uses: actions/github-script@v6
-    #   with:
-    #     script: |
-    #       github.rest.issues.createComment({
-    #         issue_number: context.issue.number,
-    #         owner: context.repo.owner,
-    #         repo: context.repo.repo,
-    #         body: '👋 Commit contains files not related to grafana config. Auto-approve rejected.'
-    #       })
-
-  
     - name: PR comment on auto-approve rejection
       uses: actions/github-script@v6
       with:
