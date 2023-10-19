@@ -64,14 +64,18 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const pr_checks = ["status-check-temp", "status-check-temp2"]
+            for (pr_check of pr_checks) {
+            console.log(pr_check);
             github.checks.create({
-              name: 'status-check-temp',
+              name: pr_check,
               head_sha: '${{ steps.commit.outputs.commit_hash }}',
               status: 'completed',
               conclusion: 'success',
               owner: context.repo.owner,
               repo: context.repo.repo
             })
+            }
 
       - name: temp branch merge
         if: steps.commit.outputs.commit_hash != ''
