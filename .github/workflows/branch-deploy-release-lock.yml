@@ -64,7 +64,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const pr_checks = ["status-check-temp", "status-check-temp2"]
+           const pr_checks = "${{ vars.GIT_STATUS_CHECKS }}".split(",")
             for (pr_check of pr_checks) {
             console.log(pr_check);
             github.checks.create({
