@@ -58,9 +58,12 @@ jobs:
       - name: temp branch merge-1
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
         run: |
+          git config --global user.email "saurabh.ghodki91@gmail.com"
+          git config --global user.name "saurabh ghodki"
           git checkout main
           git pull
           git merge --squash "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
+          git commit -m "[skip ci] deploy ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}"
 
       - name: Report status check
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
@@ -84,9 +87,6 @@ jobs:
       - name: temp branch merge-2
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
         run: |
-          git config --global user.email "saurabh.ghodki91@gmail.com"
-          git config --global user.name "saurabh ghodki"
-          git commit -m "[skip ci] deploy ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}"
           git push
 
         # uses: devmasx/merge-branch@master
