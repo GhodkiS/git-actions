@@ -56,6 +56,7 @@ jobs:
 
 
       - name: temp branch merge-1
+        id: temp-merge-1
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
         run: |
           git config --global user.email "saurabh.ghodki91@gmail.com"
@@ -64,6 +65,9 @@ jobs:
           git pull
           git merge --squash "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
           git commit -m "[skip ci] deploy ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}"
+          last_commit=$(git rev-parse HEAD)
+          echo "GITHUB_LAST_COMMIT=$last_commit" >> "${GITHUB_OUTPUT}"
+
 
       - name: Report status check
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
@@ -76,7 +80,7 @@ jobs:
             console.log(pr_check);
             github.checks.create({
               name: pr_check,
-              head_sha: '${{ steps.commit.outputs.commit_hash }}',
+              head_sha: '${{ steps.temp-merge-1.outputs.GITHUB_LAST_COMMIT }}',
               status: 'completed',
               conclusion: 'success',
               owner: context.repo.owner,
