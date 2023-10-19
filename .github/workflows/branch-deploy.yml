@@ -62,7 +62,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const pr_checks = ["status-check-temp", "status-check-temp2"]
-            for (pr_check in pr_checks) {
+            for (pr_check of pr_checks) {
             console.log(pr_check);
             github.checks.create({
               name: pr_check,
