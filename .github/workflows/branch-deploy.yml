@@ -64,7 +64,7 @@ jobs:
             const pr_checks = ["status-check-temp", "status-check-temp2"]
             for (pr_check in pr_checks) {
             github.checks.create({
-              name: ${pr_check},
+              name: pr_check,
               head_sha: '${{ steps.commit.outputs.commit_hash }}',
               status: 'completed',
               conclusion: 'success',
