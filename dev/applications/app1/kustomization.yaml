@@ -1,4 +1,5 @@
 <-------------- application content------------->
+
 # lock target environment starts
 - target:
     kind: Application
