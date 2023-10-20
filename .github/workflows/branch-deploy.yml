@@ -17,6 +17,10 @@ jobs:
 
     steps:
       - name: checkout to main
+        uses: actions/checkout@v3
+        with:
+          ref: main
+      - name: checkout with user
         run: |
           git config --global user.name 'Saurabh Ghodki'
           git config --global user.email 'saurabh.ghodki91@gmail.com'
