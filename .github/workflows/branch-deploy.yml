@@ -17,10 +17,11 @@ jobs:
 
     steps:
       - name: checkout to main
-        uses: actions/checkout@v3
-        with:
-          ref: main
-          token: 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
+        run: |
+          git config --global user.name 'Saurabh Ghodki'
+          git config --global user.email 'saurabh.ghodki91@gmail.com'
+          git remote set-url --push origin https://Ghodkis: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@github.com/GhodkiS/gilaactions
+          git checkout main
 
       - name: validate environment
         id: validate-environment
