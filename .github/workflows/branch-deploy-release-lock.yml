@@ -6,16 +6,14 @@ name: branch-deploy-release-lock
       - main
     types: [ closed ]
 
-# Permissions needed for reacting and adding comments for IssueOps commands
-permissions:
-  pull-requests: write
-  deployments: write
-  contents: write
-  checks: write
-
 jobs:
   branch-deploy-release-lock:
       runs-on: ubuntu-latest
+      permissions:
+        pull-requests: write
+        deployments: write
+        contents: write
+        checks: write
       steps:
       - name: checkout-main
         uses: actions/checkout@v3
@@ -57,6 +55,7 @@ jobs:
           branch: "${{steps.search-locks.outputs.GITHUB_ACTIVE_FIRST_LOCK}}-merge-temp"
           create_branch: true
           commit_message: "[skip ci] branch-deploy unlock ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}"
+          file_pattern: '*/applications/*/kustomization.yaml'
 
       - name: Report tests check
         if: steps.commit.outputs.commit_hash != ''
@@ -64,14 +63,18 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+           const pr_checks = "${{ vars.GIT_STATUS_CHECKS }}".split(",")
+            for (pr_check of pr_checks) {
+            console.log(pr_check);
             github.checks.create({
-              name: 'status-check-temp',
+              name: pr_check,
               head_sha: '${{ steps.commit.outputs.commit_hash }}',
               status: 'completed',
               conclusion: 'success',
               owner: context.repo.owner,
               repo: context.repo.repo
             })
+            }
 
       - name: temp branch merge
         if: steps.commit.outputs.commit_hash != ''
