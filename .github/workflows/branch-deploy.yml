@@ -54,23 +54,6 @@ jobs:
           commit_message: "[skip ci] branch-deploy lock/deploy ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}"
           file_pattern: '*/applications/*/kustomization.yaml'
 
-
-      # - name: temp branch merge-1
-      #   id: temp-merge-1
-      #   if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
-      #   run: |
-      #     git config --global user.email "saurabh.ghodki91@gmail.com"
-      #     git config --global user.name "saurabh ghodki"
-      #     git checkout main
-      #     git stash
-      #     git pull
-      #     git merge --squash "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
-      #     git commit -m "[skip ci] deploy ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}"
-      #     git log -5
-      #     last_commit=$(git rev-parse @~)
-      #     echo "GITHUB_LAST_COMMIT=$last_commit" >> "${GITHUB_OUTPUT}"
-
-
       - name: Report status check
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
         uses: actions/github-script@v3
@@ -82,7 +65,7 @@ jobs:
             console.log(pr_check);
             github.checks.create({
               name: pr_check,
-              head_sha: '${{ steps.temp-merge-1.outputs.GITHUB_LAST_COMMIT }}',
+              head_sha: '${{ steps.commit.outputs.commit_hash }}',
               status: 'completed',
               conclusion: 'success',
               owner: context.repo.owner,
@@ -90,18 +73,18 @@ jobs:
             })
             }
 
-      - name: temp branch merge-2
+
+      - name: temp branch merge
+        id: temp-merge-1
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
         run: |
+          git config --global user.email "saurabh.ghodki91@gmail.com"
+          git config --global user.name "saurabh ghodki"
+          git checkout main
+          git pull
+          git reset --hard  "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
           git push
 
-        # uses: devmasx/merge-branch@master
-        # with:
-        #   type: now
-        #   from_branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
-        #   target_branch: main
-        #   message: "[skip ci] deploy ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}"
-        #   github_token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: cleanup temp branch
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
