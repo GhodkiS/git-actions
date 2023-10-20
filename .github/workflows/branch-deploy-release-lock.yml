@@ -77,14 +77,12 @@ jobs:
             }
 
       - name: temp branch merge
-        if: steps.commit.outputs.commit_hash != ''
-        uses: devmasx/merge-branch@master
-        with:
-          type: now
-          from_branch: "${{steps.search-locks.outputs.GITHUB_ACTIVE_FIRST_LOCK}}-merge-temp"
-          target_branch: main
-          message: '[skip ci] unlock during PR merge/close'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
+        run: |
+          git checkout main
+          git pull
+          git reset --hard  "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
+          git push
       
       - name: cleanup temp branch
         if: steps.commit.outputs.commit_hash != ''

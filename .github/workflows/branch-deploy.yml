@@ -75,11 +75,8 @@ jobs:
 
 
       - name: temp branch merge
-        id: temp-merge-1
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
         run: |
-          git config --global user.email "saurabh.ghodki91@gmail.com"
-          git config --global user.name "saurabh ghodki"
           git checkout main
           git pull
           git reset --hard  "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
@@ -169,23 +166,18 @@ jobs:
             }
 
     - name: temp branch merge
-      if: steps.commit.outputs.commit_hash != ''
-      uses: devmasx/merge-branch@master
-      with:
-        type: now
-        from_branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
-        target_branch: main
-        message: "[skip ci] unlock ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}"
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-    
+      if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
+      run: |
+        git checkout main
+        git pull
+        git reset --hard  "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
+        git push
+  
     - name: cleanup temp branch
       if: steps.commit.outputs.commit_hash != ''
       run: ./.github/scripts/branch-deploy.sh -a "cleanup"
       env:
         T_ENV_APP: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
-
-
-
 
   lock-info:
     name: lock-info
