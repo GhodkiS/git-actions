@@ -225,9 +225,10 @@ jobs:
       deployments: write
     if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '.lock') && contains(github.event.comment.body, '--pr') }}
     steps:
-      - name: checkout to main
+      - name: checkout-main
         uses: actions/checkout@v3
         with:
+          fetch-depth: 0
           ref: main
 
       - name: gh cli
