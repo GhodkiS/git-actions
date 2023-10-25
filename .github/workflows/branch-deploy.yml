@@ -217,6 +217,47 @@ jobs:
           trigger: '.deploy'
           sticky_locks: "true"
 
+  lock-info-pr:
+    name: lock-info-pr
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      deployments: write
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '.lock') && contains(github.event.comment.body, '--pr') }}
+    steps:
+      - name: checkout to main
+        uses: actions/checkout@v3
+        with:
+          ref: main
+
+      - name: gh cli
+        run: ./.github/scripts/branch-deploy.sh -a "gh-cli"
+
+      - name: Get branch
+        id: 'get_branch'
+        env:
+          REPO: ${{ github.repository }}
+          PR_NO: ${{ github.event.issue.number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "branch=$(gh pr view $PR_NO --repo $REPO --json headRefName --jq '.headRefName')" >> "$GITHUB_OUTPUT"
+
+      - name: search locks
+        id: search-locks
+        run: ./.github/scripts/branch-deploy.sh -a "search-locks"
+        env:
+           T_BRANCH: ${{ steps.get_branch.outputs.branch }}
+
+      - name: PR comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ github.event.issue.number }},
+              body: "active deployments: ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}",
+            })
+
   auto-review:
     name: auto-review
     runs-on: ubuntu-latest
