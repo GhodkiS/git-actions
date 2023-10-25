@@ -81,9 +81,6 @@ echo "GITHUB_TARGET_ENV=$t_env_app" >> "${GITHUB_OUTPUT}"
 update-target-revision() {
 t_app=$(echo "$T_ENV_APP" | awk -F '_' '{print $1}')
 t_env=$(echo "$T_ENV_APP" | awk -F '_' '{print $2}')
-git config --global user.name 'test-user'
-git config --global user.email 'test-user@test.com'
-git switch -c "$T_ENV_APP-merge-temp"
 file="./$t_env/applications/$t_app/kustomization.yaml"
 sed -i '/# lock target environment starts/,/# lock target environment ends/d' "$file"
 multiline_text=$(cat <<EOF
@@ -107,8 +104,6 @@ fi
 }
 
 cleanup() {
-git config --global user.name 'test-user'
-git config --global user.email 'test-user@test.com'
 git push origin --delete "${T_ENV_APP}-merge-temp"
 }
 
@@ -124,8 +119,6 @@ echo "$updated_json" > "$json_file"
 json_content=$(cat "$json_file")
 updated_json=$(echo "$json_content" | jq --arg key "$key_to_update2" --arg value "$new_value2" '.[$key] = $value')
 echo "$updated_json" > "$json_file"
-git config --global user.name 'test-user'
-git config --global user.email 'tech.user@company.com'
 git add "$json_file"
 git commit -am "update branch target [skip ci]"
 git push
@@ -135,10 +128,7 @@ unlock-action() {
 t_app=$(echo "$T_ENV_APP" | awk -F '_' '{print $1}')
 t_env=$(echo "$T_ENV_APP" | awk -F '_' '{print $2}')
 file="./$t_env/applications/$t_app/kustomization.yaml"
-git switch -c "$T_ENV_APP-merge-temp"
 sed -i '/# lock target environment starts/,/# lock target environment ends/d' "${file}"
-git config --global user.name 'test-user'
-git config --global user.email 'test-user@test.com'
 }
 
 search-locks() {
@@ -165,8 +155,6 @@ git checkout main
 }
 
 unlock-pr-close() {
-git config --global user.name 'test-user'
-git config --global user.email 'test-user@test.com'
 for t_branches in ${ACTIVE_LOCKS//,/ }
 do
 git push origin --delete "${t_branches}-branch-deploy-lock"
@@ -175,9 +163,6 @@ done
 
 
 commit-unlock-main() {
-git config --global user.name 'test-user'
-git config --global user.email 'test-user@test.com'
-git switch -c "$ACTIVE_FIRST_LOCK-merge-temp"
 for t_env_app in ${ACTIVE_LOCKS//,/ }
 do
 t_app=$(echo "$t_env_app" | awk -F '_' '{print $1}')
@@ -185,6 +170,15 @@ t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
 file="./$t_env/applications/$t_app/kustomization.yaml"
 sed -i '/# lock target environment starts/,/# lock target environment ends/d' "${file}"
 done
+}
+
+gh-cli() {
+type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+&& sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+&& sudo apt update \
+&& sudo apt install gh -y
 }
 #===============================================================================================
 # MAIN
@@ -213,6 +207,9 @@ case $ACTION in
    ;;
  cleanup)
    cleanup
+   ;;
+gh-cli)
+   gh-cli
    ;;
  *)
    exit_with_error
