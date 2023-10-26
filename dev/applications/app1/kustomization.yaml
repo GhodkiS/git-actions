@@ -6,5 +6,5 @@
   patch: |-
     - op: replace
         path: /spec/source/targetRevision
-        value: branch3
+        value: branch5
 # lock target environment ends
