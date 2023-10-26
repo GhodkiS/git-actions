@@ -331,6 +331,7 @@ jobs:
             }
           else if("${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}}" != '' || "${{steps.search-locks-dev.outputs.GITHUB_LOCK_APPS}}" != '' )
             {
+              
               t_comment = "Following deployments are active, cannot approve PR: \n" + "${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}}" + '\n' + "${{steps.search-locks-dev.outputs.GITHUB_LOCK_APPS}}"
             }
           else
