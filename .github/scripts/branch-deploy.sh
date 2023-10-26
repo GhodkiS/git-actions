@@ -154,6 +154,15 @@ fi
 git checkout main
 }
 
+search-locks-app() {
+json_file="lock.json"
+branch=$(git branch -r | grep "\-branch\-deploy\-lock" | grep "$T_ENV")
+if [[ -n "${branch}" ]]; then
+github_lock_app="${GITHUB_LOCK_APPS},${T_ENV}"
+echo "GITHUB_LOCK_APPS=${github_lock_app#,}" >> "${GITHUB_OUTPUT}"
+fi
+}
+
 unlock-pr-close() {
 for t_branches in ${ACTIVE_LOCKS//,/ }
 do

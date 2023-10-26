@@ -259,18 +259,21 @@ jobs:
               body: "active deployments: ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}",
             })
 
-  auto-review:
-    name: auto-review
+  auto-approve:
+    name: auto-approve
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
       deployments: write
       contents: read
       checks: none
-    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '.auto-review') }}
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '.auto-approve') }}
     steps:
-    - name: checkout
+    - name: checkout-main
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        ref: main
 
     - name: gh cli
       run: ./.github/scripts/branch-deploy.sh -a "gh-cli"
@@ -290,12 +293,30 @@ jobs:
         ref: ${{ steps.get_branch.outputs.branch }} # your feature branch
         filters: |
             all-dev:
-              - 'dev/**'
+              - 'grafana/*/dashboard/**'
             not-all-dev:
-              - '!dev/**'
+              - '!grafana/*/dashboard/**'
+            grafana-prod:
+              - '*grafana/prod**'
+            grafana-dev:
+              - '*grafana/dev**'
+      
+    - name: search locks grafana dev
+      if: ${{ steps.filter.outputs.all-dev == 'true' && steps.filter.outputs.not-all-dev  == 'false' && steps.filter.outputs.grafana-dev == 'true' }}
+      id: search-locks-dev
+      run: ./.github/scripts/branch-deploy.sh -a "search-locks-app"
+      env:
+          T_ENV: "app1_dev"
+
+    - name: search locks grafana prod
+      if: ${{ steps.filter.outputs.all-dev == 'true' && steps.filter.outputs.not-all-dev  == 'false' && steps.filter.outputs.grafana-prod == 'true' }}
+      id: search-locks-prod
+      run: ./.github/scripts/branch-deploy.sh -a "search-locks-app"
+      env:
+          T_ENV: "app1_qa"
 
     - name: Auto approve for dashboard
-      if: ${{ steps.filter.outputs.all-dev == 'true' && steps.filter.outputs.not-all-dev  == 'false' }}
+      if: ${{ steps.filter.outputs.all-dev == 'true' && steps.filter.outputs.not-all-dev  == 'false' && steps.search-locks-prod.outputs.GITHUB_LOCK_APPS == "" }}
       uses: hmarr/auto-approve-action@44888193675f29a83e04faf4002fa8c0b537b1e4
       with:
         pull-request-number: ${{ github.event.issue.number }}
@@ -304,18 +325,22 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
-          if ("${{steps.filter.outputs.not-all-dev}}" == "false") 
-          {
-           reaction = '+1'
-          }
+          if (${{ steps.filter.outputs.all-dev }} == "true" && ${{steps.filter.outputs.not-all-dev}}  == "false" && ${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}} == "") 
+            {
+            t_comment = 'Approved!'
+            }
+          elseif(${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}} != "")
+            {
+              t_comment = 'Following deployments are active, cannot approve: ' + "${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}}"
+            }
           else
           {
-            reaction = '-1'
+             t_comment = 'cannot approve, check if commit only contains allowed files.'
           }
-          github.rest.reactions.createForIssueComment({
+          github.rest.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            comment_id: "${{github.event.comment.id}}",
-            content: reaction,
+            issue_number: ${{ github.event.issue.number }},
+            body: "${t_comment}"
           })
 
