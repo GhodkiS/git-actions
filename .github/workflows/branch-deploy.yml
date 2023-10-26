@@ -316,7 +316,7 @@ jobs:
           T_ENV: "app1_qa"
 
     - name: Auto approve for dashboard
-      if: ${{ steps.filter.outputs.all-dev == 'true' && steps.filter.outputs.not-all-dev  == 'false' && steps.search-locks-prod.outputs.GITHUB_LOCK_APPS == '' }}
+      if: ${{ steps.filter.outputs.all-dev == 'true' && steps.filter.outputs.not-all-dev  == 'false' && steps.search-locks-prod.outputs.GITHUB_LOCK_APPS == '' && && steps.search-locks-dev.outputs.GITHUB_LOCK_APPS == '' }}
       uses: hmarr/auto-approve-action@44888193675f29a83e04faf4002fa8c0b537b1e4
       with:
         pull-request-number: ${{ github.event.issue.number }}
@@ -325,7 +325,7 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
-          if ("${{ steps.filter.outputs.all-dev }}" == "true" && "${{steps.filter.outputs.not-all-dev}}"  == "false" && "${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}}" == "") 
+          if ("${{ steps.filter.outputs.all-dev }}" == "true" && "${{steps.filter.outputs.not-all-dev}}"  == "false" && "${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}}" == "" && "${{steps.search-locks-dev.outputs.GITHUB_LOCK_APPS}}" == "") 
             {
             t_comment = 'Approved!'
             }
