@@ -325,11 +325,11 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
-          if (${{ steps.filter.outputs.all-dev }} == "true" && ${{steps.filter.outputs.not-all-dev}}  == "false" && ${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}} == '') 
+          if ("${{ steps.filter.outputs.all-dev }}" == "true" && "${{steps.filter.outputs.not-all-dev}}"  == "false" && "${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}}" == "") 
             {
             t_comment = 'Approved!'
             }
-          elseif(${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}} != '')
+          elseif("${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}}" != '')
             {
               t_comment = 'Following deployments are active, cannot approve: ' + "${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}}"
             }
