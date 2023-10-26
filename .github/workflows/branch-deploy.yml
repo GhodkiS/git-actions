@@ -297,9 +297,9 @@ jobs:
             not-all-dev:
               - '!grafana/*/dashboard/**'
             grafana-prod:
-              - 'grafana/prod**'
+              - '*grafana/prod*'
             grafana-dev:
-              - 'grafana/dev**'
+              - '*grafana/dev*'
       
     - name: search locks grafana dev
       if: ${{ steps.filter.outputs.all-dev == 'true' && steps.filter.outputs.not-all-dev  == 'false' && steps.filter.outputs.grafana-dev == 'true' }}
