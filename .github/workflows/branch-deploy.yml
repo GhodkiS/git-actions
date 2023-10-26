@@ -331,12 +331,12 @@ jobs:
             }
           else if("${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}}" != '' || "${{steps.search-locks-dev.outputs.GITHUB_LOCK_APPS}}" != '' )
             {
-              t_comment = 'Following deployments are active, cannot approve: ' + "${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}}" + "${{steps.search-locks-dev.outputs.GITHUB_LOCK_APPS}}"
+              t_comment = 'Following deployments are active, cannot approve: ' + "${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}}" + ", " + ${{steps.search-locks-dev.outputs.GITHUB_LOCK_APPS}}"
             }
           else
-          {
-             t_comment = 'cannot approve, check if commit only contains allowed files.'
-          }
+            {
+              t_comment = 'cannot approve, check if commit only contains allowed files.'
+            }
           github.rest.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
