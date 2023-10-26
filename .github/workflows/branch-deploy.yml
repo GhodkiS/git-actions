@@ -329,7 +329,7 @@ jobs:
             {
             t_comment = 'Approved!'
             }
-          elseif("${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}}" != '')
+          else if("${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}}" != '')
             {
               t_comment = 'Following deployments are active, cannot approve: ' + "${{steps.search-locks-prod.outputs.GITHUB_LOCK_APPS}}"
             }
