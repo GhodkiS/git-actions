@@ -341,6 +341,6 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: ${{ github.event.issue.number }},
-            body: "${t_comment}"
+            body: t_comment
           })
 
