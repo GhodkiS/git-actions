@@ -208,6 +208,9 @@ case $ACTION in
  search-locks)
    search-locks
    ;;
+ search-locks-app)
+   search-locks-app
+   ;;
  unlock-pr-close)
    unlock-pr-close
    ;;
