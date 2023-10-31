@@ -55,7 +55,7 @@ runs:
           git remote set-url --push origin https://Ghodkis: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@github.com/GhodkiS/gilaactions
           git checkout main
           git pull
-          git reset --hard  "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
+          git reset --hard  "${{inputs.target-env}}-merge-temp"
           git push
 
       
