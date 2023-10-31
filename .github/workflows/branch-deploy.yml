@@ -44,7 +44,7 @@ jobs:
           skip_reviews: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
 
       - name: merge to  main
-        uses: ./.github/workflows/actions/merge-main@main
+        uses: ./.github/workflows/actions/merge-main
         with:
           bd-output: ${{steps.branch-deploy.outputs.continue}}
           target-env: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
