@@ -42,7 +42,7 @@ jobs:
           sticky_locks: "true"
           update_branch: disabled
           skip_reviews: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
-      ./.github/scripts/branch-deploy.sh
+
       - name: merge to  main
         uses: ./.github/workflows/actions/merge-main@v1
         with:
