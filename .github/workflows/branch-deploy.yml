@@ -50,62 +50,62 @@ jobs:
           T_ENV_APP: ${{steps.branch-deploy.outputs.environment}}
           T_BRANCH: ${{steps.branch-deploy.outputs.ref}}
 
-      # - name: merge to  main
-      #   uses: ./.github/workflows/actions/merge-main
-      #   with:
-      #     bd-output: ${{steps.branch-deploy.outputs.continue}}
-      #     target-env: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
-      #     git-checks: ${{vars.GIT_STATUS_CHECKS}}
+      - name: merge to  main
+        uses: ./.github/workflows/actions/merge-main
+        with:
+          bd-output: ${{steps.branch-deploy.outputs.continue}}
+          target-env: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
+          git-checks: ${{vars.GIT_STATUS_CHECKS}}
 
     
 
-      - name: temp branch commit
-        uses: stefanzweifel/git-auto-commit-action@v5
-        if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
-        id: commit
-        with:
-          branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
-          create_branch: true
-          commit_message: "[skip ci] branch-deploy lock/deploy ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}"
-          file_pattern: '*/applications/*/kustomization.yaml'
+      # - name: temp branch commit
+      #   uses: stefanzweifel/git-auto-commit-action@v5
+      #   if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
+      #   id: commit
+      #   with:
+      #     branch: "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
+      #     create_branch: true
+      #     commit_message: "[skip ci] branch-deploy lock/deploy ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}"
+      #     file_pattern: '*/applications/*/kustomization.yaml'
 
-      - name: Report status check
-        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
-        uses: actions/github-script@v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const pr_checks = "${{ vars.GIT_STATUS_CHECKS }}".split(",")
-            for (pr_check of pr_checks) {
-            console.log(pr_check);
-            github.checks.create({
-              name: pr_check,
-              head_sha: '${{ steps.commit.outputs.commit_hash }}',
-              status: 'completed',
-              conclusion: 'success',
-              owner: context.repo.owner,
-              repo: context.repo.repo
-            })
-            }
+      # - name: Report status check
+      #   if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
+      #   uses: actions/github-script@v3
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     script: |
+      #       const pr_checks = "${{ vars.GIT_STATUS_CHECKS }}".split(",")
+      #       for (pr_check of pr_checks) {
+      #       console.log(pr_check);
+      #       github.checks.create({
+      #         name: pr_check,
+      #         head_sha: '${{ steps.commit.outputs.commit_hash }}',
+      #         status: 'completed',
+      #         conclusion: 'success',
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo
+      #       })
+      #       }
 
 
-      - name: temp branch merge
-        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
-        run: |
-          git config --global user.name 'Saurabh Ghodki'
-          git config --global user.email 'saurabh.ghodki91@gmail.com'
-          git remote set-url --push origin https://Ghodkis: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@github.com/GhodkiS/gilaactions
-          git checkout main
-          git pull
-          git reset --hard  "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
-          git push
+      # - name: temp branch merge
+      #   if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
+      #   run: |
+      #     git config --global user.name 'Saurabh Ghodki'
+      #     git config --global user.email 'saurabh.ghodki91@gmail.com'
+      #     git remote set-url --push origin https://Ghodkis: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@github.com/GhodkiS/gilaactions
+      #     git checkout main
+      #     git pull
+      #     git reset --hard  "${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}-merge-temp"
+      #     git push
 
       
-      - name: cleanup temp branch
-        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
-        run: ./.github/scripts/branch-deploy.sh -a "cleanup"
-        env:
-          T_ENV_APP: ${{steps.branch-deploy.outputs.environment}}
+      # - name: cleanup temp branch
+      #   if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.commit.outputs.commit_hash != '' }}
+      #   run: ./.github/scripts/branch-deploy.sh -a "cleanup"
+      #   env:
+      #     T_ENV_APP: ${{steps.branch-deploy.outputs.environment}}
 
       - name: checkout to lock branch
         uses: actions/checkout@v3
