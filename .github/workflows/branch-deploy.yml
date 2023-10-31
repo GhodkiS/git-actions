@@ -42,9 +42,8 @@ jobs:
           sticky_locks: "true"
           update_branch: disabled
           skip_reviews: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
-
-      - uses: actions/checkout@v4
-      - id: foo
+      
+      - name: merge to  main
         uses: ./actions/merge-main@v1
         with:
           bd-output: ${{steps.branch-deploy.outputs.continue}}
