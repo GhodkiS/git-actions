@@ -43,6 +43,13 @@ jobs:
           update_branch: disabled
           skip_reviews: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
 
+      - name: update target revision
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
+        run: ./.github/scripts/branch-deploy.sh -a "update-target-revision"
+        env:
+          T_ENV_APP: ${{steps.branch-deploy.outputs.environment}}
+          T_BRANCH: ${{steps.branch-deploy.outputs.ref}}
+
       - name: merge to  main
         uses: ./.github/workflows/actions/merge-main
         with:
@@ -50,12 +57,7 @@ jobs:
           target-env: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
           git-checks: ${{vars.GIT_STATUS_CHECKS}}
 
-      # - name: update target revision
-      #   if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
-      #   run: ./.github/scripts/branch-deploy.sh -a "update-target-revision"
-      #   env:
-      #     T_ENV_APP: ${{steps.branch-deploy.outputs.environment}}
-      #     T_BRANCH: ${{steps.branch-deploy.outputs.ref}}
+    
 
       # - name: temp branch commit
       #   uses: stefanzweifel/git-auto-commit-action@v5
