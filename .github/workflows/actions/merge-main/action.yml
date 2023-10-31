@@ -50,9 +50,6 @@ runs:
         shell: bash
         if: ${{ inputs.bd-output == 'true'  && steps.commit.outputs.commit_hash != '' }}
         run: |
-          git config --global user.name 'Saurabh Ghodki'
-          git config --global user.email 'saurabh.ghodki91@gmail.com'
-          git remote set-url --push origin https://Ghodkis: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@github.com/GhodkiS/gilaactions
           git checkout main
           git reset --hard  "${{inputs.target-env}}-merge-temp"
           git pull
