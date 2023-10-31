@@ -9,6 +9,10 @@ inputs:
     description: 'temporary branch name'
     required: true
 
+  git-checks:  # id of input
+    description: 'repository checks'
+    required: true
+
 runs:
   using: 'composite'
   steps:
@@ -26,9 +30,9 @@ runs:
         if: ${{ inputs.bd-output == 'true'  && steps.commit.outputs.commit_hash != '' }}
         uses: actions/github-script@v3
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # github-token: ${{ secrets.GITHUB_TOKEN }} 
           script: |
-            const pr_checks = "${{ vars.GIT_STATUS_CHECKS }}".split(",")
+            const pr_checks = "${{ inputs.git-checks }}".split(",")
             for (pr_check of pr_checks) {
             console.log(pr_check);
             github.checks.create({

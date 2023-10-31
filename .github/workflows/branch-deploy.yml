@@ -48,6 +48,7 @@ jobs:
         with:
           bd-output: ${{steps.branch-deploy.outputs.continue}}
           target-env: ${{steps.validate-environment.outputs.GITHUB_TARGET_ENV}}
+          git-checks: ${{vars.GIT_STATUS_CHECKS}}
 
       # - name: update target revision
       #   if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
