@@ -23,7 +23,7 @@ runs:
         with:
           branch: "${{inputs.target-env}}-merge-temp"
           create_branch: true
-          commit_message: "[skip ci] branch-deploy lock/deploy ${{secrets.GIT_STATUS_CHECKS}}"
+          commit_message: "[skip ci] branch-deploy lock/deploy ${{inputs.git-checks}}"
           file_pattern: '*/applications/*/kustomization.yaml'
 
       - name: Report status check
