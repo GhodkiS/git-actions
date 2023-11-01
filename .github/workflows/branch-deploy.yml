@@ -307,6 +307,17 @@ jobs:
         fetch-depth: 0
         ref: main
 
+    - name: watching it
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.reactions.createForIssueComment({
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          comment_id: "${{ github.event.comment.id }}",
+          content: "eyes",
+          });
+
     - name: gh cli
       run: ./.github/scripts/branch-deploy.sh -a "gh-cli"
 
