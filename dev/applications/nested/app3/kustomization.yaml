@@ -1,1 +1,10 @@
 <------------- application content ------------>
+# lock target environment starts
+- target:
+    kind: Application
+    name: nested-app3
+  patch: |-
+    - op: replace
+        path: /spec/source/targetRevision
+        value: branch6
+# lock target environment ends
