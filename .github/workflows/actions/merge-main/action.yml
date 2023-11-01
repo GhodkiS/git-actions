@@ -1,0 +1,62 @@
+name: 'merge-main'
+description: 'merge temp branch changes to main'
+inputs:
+  bd-output:
+    description: 'branch deploy output'
+    required: true
+    default: 'true'
+  target-env:
+    description: 'temporary branch name'
+    required: true
+
+  git-checks:
+    description: 'repository checks'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+      - name: temp branch commit
+        uses: stefanzweifel/git-auto-commit-action@v5
+        if: ${{ inputs.bd-output == 'true' }}
+        id: commit
+        with:
+          branch: "${{inputs.target-env}}-merge-temp"
+          create_branch: true
+          commit_message: "[skip ci] branch-deploy lock/deploy ${{secrets.GIT_STATUS_CHECKS}}"
+          file_pattern: '*/applications/*/kustomization.yaml'
+
+      - name: Report status check
+        if: ${{ inputs.bd-output == 'true'  && steps.commit.outputs.commit_hash != '' }}
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const pr_checks = "${{ inputs.git-checks }}".split(",")
+            for (pr_check of pr_checks) {
+            console.log(pr_check);
+            github.checks.create({
+              name: pr_check,
+              head_sha: '${{ steps.commit.outputs.commit_hash }}',
+              status: 'completed',
+              conclusion: 'success',
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            })
+            }
+
+      - name: temp branch merge
+        shell: bash
+        if: ${{ inputs.bd-output == 'true'  && steps.commit.outputs.commit_hash != '' }}
+        run: |
+          git checkout main
+          git reset --hard  "${{inputs.target-env}}-merge-temp"
+          git pull
+          git push
+
+      
+      - name: cleanup temp branch
+        shell: bash
+        if: ${{ inputs.bd-output == 'true'  && steps.commit.outputs.commit_hash != '' }}
+        run: ./.github/scripts/branch-deploy.sh -a "cleanup"
+        env:
+          T_ENV_APP: ${{inputs.target-env}}

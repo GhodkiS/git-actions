@@ -81,13 +81,14 @@ echo "GITHUB_TARGET_ENV=$t_env_app" >> "${GITHUB_OUTPUT}"
 update-target-revision() {
 t_app=$(echo "$T_ENV_APP" | awk -F '_' '{print $1}')
 t_env=$(echo "$T_ENV_APP" | awk -F '_' '{print $2}')
+t_updated_app="${t_app////-}"
 file="./$t_env/applications/$t_app/kustomization.yaml"
 sed -i '/# lock target environment starts/,/# lock target environment ends/d' "$file"
 multiline_text=$(cat <<EOF
 # lock target environment starts
 - target:
     kind: Application
-    name: $t_app
+    name: $t_updated_app
   patch: |-
     - op: replace
         path: /spec/source/targetRevision
@@ -158,8 +159,7 @@ search-locks-app() {
 json_file="lock.json"
 branch=$(git branch -r | grep "\-branch\-deploy\-lock" | grep "$T_ENV")
 if [[ -n "${branch}" ]]; then
-github_lock_app="${GITHUB_LOCK_APPS},${T_ENV}"
-echo "GITHUB_LOCK_APPS=${github_lock_app#,}" >> "${GITHUB_OUTPUT}"
+echo "GITHUB_LOCK_APPS=${T_ENV}" >> "${GITHUB_OUTPUT}"
 fi
 }
 
@@ -207,6 +207,9 @@ case $ACTION in
    ;;
  search-locks)
    search-locks
+   ;;
+ search-locks-app)
+   search-locks-app
    ;;
  unlock-pr-close)
    unlock-pr-close
