@@ -1,15 +1,15 @@
 name: 'merge-main'
-description: 'merge changes to main'
+description: 'merge temp branch changes to main'
 inputs:
-  bd-output:  # id of input
+  bd-output:
     description: 'branch deploy output'
     required: true
     default: 'true'
-  target-env:  # id of input
+  target-env:
     description: 'temporary branch name'
     required: true
 
-  git-checks:  # id of input
+  git-checks:
     description: 'repository checks'
     required: true
 
@@ -23,14 +23,16 @@ runs:
         with:
           branch: "${{inputs.target-env}}-merge-temp"
           create_branch: true
-          commit_message: "[skip ci] branch-deploy lock/deploy ${{inputs.target-env}}"
+          commit_message: "[skip ci] branch-deploy lock/deploy ${{secrets.GIT_STATUS_CHECKS}}"
           file_pattern: '*/applications/*/kustomization.yaml'
+          commit_user_name: My GitHub Actions Bot # defaults to "github-actions[bot]"
+          commit_user_email: my-github-actions-bot@example.org # defaults to "41898282+github-actions[bot]@users.noreply.github.com"
+          commit_author: Author <actions@github.com> 
 
       - name: Report status check
         if: ${{ inputs.bd-output == 'true'  && steps.commit.outputs.commit_hash != '' }}
         uses: actions/github-script@v3
         with:
-          # github-token: ${{ secrets.GITHUB_TOKEN }} 
           script: |
             const pr_checks = "${{ inputs.git-checks }}".split(",")
             for (pr_check of pr_checks) {
@@ -44,7 +46,6 @@ runs:
               repo: context.repo.repo
             })
             }
-
 
       - name: temp branch merge
         shell: bash
