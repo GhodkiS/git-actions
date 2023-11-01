@@ -267,11 +267,18 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            if("${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}" == "") {
+            t_comment = "no active deployments found"
+            }
+            else
+            {
+            t_comment = "active deployments: ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}"
+            }
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: ${{ github.event.issue.number }},
-              body: "active deployments: ${{steps.search-locks.outputs.GITHUB_ACTIVE_LOCKS}}",
+              body: t_comment
             })
 
   auto-approve:
