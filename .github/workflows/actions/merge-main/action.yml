@@ -25,9 +25,6 @@ runs:
           create_branch: true
           commit_message: "[skip ci] branch-deploy lock/deploy ${{secrets.GIT_STATUS_CHECKS}}"
           file_pattern: '*/applications/*/kustomization.yaml'
-          commit_user_name: My GitHub Actions Bot # defaults to "github-actions[bot]"
-          commit_user_email: my-github-actions-bot@example.org # defaults to "41898282+github-actions[bot]@users.noreply.github.com"
-          commit_author: Author <actions@github.com> 
 
       - name: Report status check
         if: ${{ inputs.bd-output == 'true'  && steps.commit.outputs.commit_hash != '' }}
