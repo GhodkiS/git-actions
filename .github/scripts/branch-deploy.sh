@@ -72,7 +72,6 @@ t_env=$(echo "$t_env_app" | awk -F '_' '{print $2}')
 if [ ! -f "./$t_env/applications/$t_app/kustomization.yaml" ]
 then
 echo "no $t_env_app target  environment found"
-exit 1
 fi
 echo "GITHUB_TARGET_ENV=$t_env_app" >> "${GITHUB_OUTPUT}"
 }
