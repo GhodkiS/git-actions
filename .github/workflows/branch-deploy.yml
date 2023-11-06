@@ -34,7 +34,7 @@ jobs:
           COMMENT_BODY: ${{github.event.comment.body}}
 
       - name: invalid environment
-        if: ${{ steps.validate-environment.outputs.GITHUB_TARGET_ENV == '' }}
+        if: ${{ steps.validate-environment.outputs.GITHUB_TARGET_ENV == 'invalid' }}
         uses: actions/github-script@v6
         with:
           script: |
