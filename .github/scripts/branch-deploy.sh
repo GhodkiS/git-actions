@@ -73,8 +73,9 @@ if [ ! -f "./$t_env/applications/$t_app/kustomization.yaml" ]
 then
 echo "no $t_env_app target  environment found"
 echo "GITHUB_TARGET_ENV=invalid" >> "${GITHUB_OUTPUT}"
-fi
+else
 echo "GITHUB_TARGET_ENV=$t_env_app" >> "${GITHUB_OUTPUT}"
+fi
 }
 
 
